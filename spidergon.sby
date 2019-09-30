@@ -1,0 +1,36 @@
+[tasks]
+proof
+cover
+
+[options]
+proof: mode prove
+proof: depth 10
+
+cover: mode cover
+cover: depth 7
+cover: append 3
+
+[engines]
+smtbmc yices
+# smtbmc boolector
+# abc pdr
+# aiger avy
+# aiger suprove
+
+[script]
+read_verilog -formal spidergon_top.v
+read_verilog -formal spidergon_node.v
+read_verilog -formal router.v
+read_verilog -formal arbiter.v
+read_verilog -formal sync_fifo.v
+read_verilog -formal oh_to_idx.v
+
+prep -top spidergon_top
+
+[files]
+spidergon_top.v
+spidergon_node.v
+router.v
+arbiter.v
+sync_fifo.v
+oh_to_idx.v
