@@ -75,7 +75,7 @@ begin
 	//  after the corresponding 'req' had been granted/given permission to proceed)
 	//  Rotation wraps around upon reaching MSB
 
-	else if((grant & req_previous) == grant) // this determines whether the same client request had been granted
+	else if((!idle) && ((grant & req_previous) == grant)) // this determines whether the same client request had been granted
 
 		base <= (base[WIDTH-1]) ? 1 : (base << 1);
 end

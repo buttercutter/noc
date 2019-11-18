@@ -146,17 +146,19 @@ wire [NUM_OF_PORTS-1:0] req_port;
 // note that 'grant' is one-hot vector, 
 // when asserted, it means the corresponding 'req' is approved/granted
 // and only a single priority line is serviced (granted) at any given clock cycle
-wire [NUM_OF_VIRTUAL_CHANNELS-1:0] granted_vc;
+wire [NUM_OF_VIRTUAL_CHANNELS-1:0] granted_vc [NUM_OF_PORTS-1:0];
 wire [NUM_OF_PORTS-1:0] granted_port;
 
 // binary encoding of 'granted_vc' and 'granted_port'. Refer to module 'oh_to_idx'
-wire [$clog2(NUM_OF_VIRTUAL_CHANNELS)-1:0] granted_vc_index;
+wire [$clog2(NUM_OF_VIRTUAL_CHANNELS)-1:0] granted_vc_index [NUM_OF_PORTS-1:0];
 wire [$clog2(NUM_OF_PORTS)-1:0] granted_port_index;
 
 
 // for detecting if all outstanding requests are already served
 wire [NUM_OF_PORTS-1:0] requests_in_ports_have_been_served = req_port & granted_port;
 wire [NUM_OF_PORTS-1:0] outstanding_requests_in_multiple_ports = req_port - granted_port;
+//wire [NUM_OF_VIRTUAL_CHANNELS-1:0] outstanding_requests_in_multiple_vcs =
+//							 		req[granted_port_index] - granted_vc[granted_port_index];
 
 // https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
 wire requests_from_multiple_ports = !((req_port != 0) && ((req_port & (req_port - 1)) == 0));
@@ -167,15 +169,9 @@ arbiter #(NUM_OF_PORTS) rr_arb_port_to_cpu
 (.clk(clk), .reset(reset), .req(outstanding_requests_in_multiple_ports), .grant(granted_port));
 
 
-// remember that each ports have multiple vc
-// virtual channel (VC) outgoing buffers round-robin arbitration (maps vc in port to cpu)
-arbiter #(NUM_OF_VIRTUAL_CHANNELS) rr_arb_vc_to_cpu
-(.clk(clk), .reset(reset), .req(req[granted_port_index]), .grant(granted_vc));
-
-
 // for one-hot encoding to binary encoding conversion
 oh_to_idx #(NUM_OF_PORTS) port_index (.one_hot(granted_port), .index(granted_port_index));
-oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) vc_index (.one_hot(granted_vc), .index(granted_vc_index));
+
 
 
 reg [NUM_OF_PORTS-1:0] past_req_port;
@@ -186,9 +182,9 @@ begin
 	if(reset & reset_previously)
 		node_data_to_cpu = data_input;
 
-	else if(past_req_port == 0) node_data_to_cpu = 0;
+	else if(reset || (past_req_port == 0)) node_data_to_cpu = 0;
 
-	else node_data_to_cpu = data_output_from_vc[granted_port_index][granted_vc_index];
+	else node_data_to_cpu = data_output_from_vc[granted_port_index][granted_vc_index[granted_port_index]];
 end
 
 
@@ -254,6 +250,24 @@ generate
 
 	for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 	begin : PORTS	
+
+
+		// remember that each ports have multiple vc
+		// virtual channel (VC) outgoing buffers round-robin arbitration (maps vc in port to cpu)
+		arbiter #(NUM_OF_VIRTUAL_CHANNELS) rr_arb_vc_to_cpu
+		(.clk(clk), .reset(reset), 
+		 .req(req[port_num]), 
+		 .grant(granted_vc[port_num]));
+
+
+		// for one-hot encoding to binary encoding conversion
+
+		oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) vc_index 
+		(
+			.one_hot(granted_vc[port_num]), 
+			.index(granted_vc_index[port_num])
+		);
+
 
 		`ifdef FORMAL
 			assign out_port_num[port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH] = direction[port_num];
@@ -437,7 +451,7 @@ generate
 
 		assign dest_node[port_num] = (reset) ? 
 				data_input[(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH] :
-				flit_data_output[port_num][(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH];
+				flit_data_input[port_num][(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH];
 
 		// path routing computation block for each input ports
 		router #(NUM_OF_NODES) rt 
@@ -454,7 +468,7 @@ generate
 		always @(posedge clk) valid_output_previously[port_num] <= valid_output[port_num];
 
 		// for aligning correctly with 'flit_data_output' in the same clock cycle
-		assign flit_data_output_are_valid[port_num] = valid_output[port_num];	
+		assign flit_data_output_are_valid[port_num] = valid_output_previously[port_num];	
 	
 
 		// needs some backpressure logic here
@@ -469,23 +483,25 @@ generate
 					 (output_flit_type == BODY_FLIT)));
 
 
-		always @(*)
+		always @(posedge clk)
 		begin
 			//flit_data_output[port_num] <= 0; // clears data in all channels first
 
 			if(reset) 
 			begin
 				if(valid_output[port_num])
-					flit_data_output[port_num] = data_input; // initial data input for NoC
+					flit_data_output[port_num] <= data_input; // initial data input for NoC
 
-				else flit_data_output[port_num] = 0; // clears data in all channels
+				else flit_data_output[port_num] <= 0; // clears data in all channels
 			end
 			
 			else if(valid_output[port_num]) begin
 				// needs some backpressure logic here
 				// sends out data from cpu to physical channel
-				flit_data_output[port_num] = node_data_from_cpu;
+				flit_data_output[port_num] <= node_data_from_cpu;
 			end
+
+			else flit_data_output[port_num] <=0;
 		end
 
 	end

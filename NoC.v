@@ -12,13 +12,15 @@ module NoC
 
 	parameter NUM_OF_VIRTUAL_CHANNELS=2 // 2 vc for each input ports of each node
 ) 
-(clk, reset);
+(clk, reset, done);
 
 input clk, reset;
+output done;
 
 reg  [NUM_OF_NODES*FLIT_TOTAL_WIDTH-1:0] data_input;
 wire [FLIT_DATA_WIDTH-1:0] data_output;
 
+assign done = (data_output == 1); // just to avoid EDA tool optimizes away NoC design logic
 
 localparam HEAD_TAIL = 2;
 localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+FLIT_DATA_WIDTH;
@@ -60,14 +62,19 @@ generate
     	
 		    always@(posedge clk)
 		    begin
-		    	if(node_num == 1) // send data from node 1 to node 0
-		    	begin
-			        data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-			                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
-			    end 
-			                    
-				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-			                    {TAIL_FLIT, {FLIT_DATA_WIDTH{1'b0}}};    
+				if(reset)
+				begin
+					if(node_num == 1) // send data from node 1 to node 0
+					begin
+					    data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
+					                {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
+					end 
+					                
+					else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
+					                {TAIL_FLIT, {FLIT_DATA_WIDTH{1'b0}}};    
+				end
+
+				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 0;
 		    end
 		     		    	
     	`endif
@@ -81,14 +88,19 @@ generate
     	
 		    always@(posedge clk)
 		    begin
-		    	if((node_num == 1) || (node_num == 2))
-		    	begin
-			        data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-			                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
-			    end 
-			                    
-				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-			                    {TAIL_FLIT, {FLIT_DATA_WIDTH{1'b0}}};    
+				if(reset)
+				begin
+					if((node_num == 1) || (node_num == 2))
+					begin
+					    data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
+					                {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
+					end 
+					                
+					else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
+					                {TAIL_FLIT, {FLIT_DATA_WIDTH{1'b0}}}; 
+				end
+
+				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 0;   
 		    end
 		     		    	
     	`endif
@@ -103,14 +115,19 @@ generate
     	
 		    always@(posedge clk)
 		    begin
-		    	if((node_num == 1) || (node_num == 2) || (node_num == 6) || (node_num == 7))
-		    	begin
-			        data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-			                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
-			    end 
-			                    
-				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-			                    {TAIL_FLIT, {FLIT_DATA_WIDTH{1'b0}}};    
+				if(reset)
+				begin
+					if((node_num == 1) || (node_num == 2) || (node_num == 6) || (node_num == 7))
+					begin
+					    data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
+					                {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
+					end 
+					                
+					else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
+					                {TAIL_FLIT, {FLIT_DATA_WIDTH{1'b0}}}; 
+				end
+
+				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 0;   
 		    end
 		     		    	
     	`endif
@@ -118,8 +135,12 @@ generate
     	`ifdef ALL_NODES_SENDING
     	
 		    always@(posedge clk)
-		        data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-		                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]};	    
+			begin
+		        if(reset) data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
+		                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]};	 
+	
+				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 0;
+			end
 		`endif
     end
 endgenerate
