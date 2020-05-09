@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon Nov 18 08:37:36 2019
+[*] Sat May  9 02:57:11 2020
 [*]
-[dumpfile] "/home/chengfei/Downloads/noc/spidergon.vcd"
-[dumpfile_mtime] "Mon Nov 18 08:37:14 2019"
-[dumpfile_size] 110785
-[savefile] "/home/chengfei/Downloads/noc/spidergon.gtkw"
+[dumpfile] "/home/rog/Downloads/noc/spidergon.vcd"
+[dumpfile_mtime] "Sat May  9 02:19:13 2020"
+[dumpfile_size] 110849
+[savefile] "/home/rog/Downloads/noc/spidergon.gtkw"
 [timestart] 0
-[size] 960 995
-[pos] -1 -1
-*-6.629109 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 927 1025
+[pos] -51 -1
+*-6.122874 45 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test_spidergon.
 [treeopen] test_spidergon.noc.
 [treeopen] test_spidergon.noc.sp.
 [treeopen] test_spidergon.noc.sp.NODES[0].
 [sst_width] 43
-[signals_width] 563
+[signals_width] 414
 [sst_expanded] 0
 [sst_vpaned_height] 381
 @28
