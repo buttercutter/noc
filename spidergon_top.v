@@ -284,17 +284,10 @@ generate
 		begin
 			if(reset) destination_address_matches[node_num] <= 0;
 	
-			else begin
-
-				for(source_node_num = 1; source_node_num<=NUM_OF_NODES; 
-					source_node_num = source_node_num + 1)
-				begin
-					if(node_num == 
-						data_input[(source_node_num*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH])
-
-						destination_address_matches[node_num] <= 1;	
-				end	
-			end	
+			else if(node_num == 
+						data_input[((node_num+1)*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH])
+						
+				destination_address_matches[node_num] <= 1;
 		end
 
 
