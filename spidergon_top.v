@@ -256,8 +256,16 @@ generate
 
 
 		`ifdef FORMAL
-		initial	assume(data_input[((node_num+1)*FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER);
+		//initial	assume(data_input[((node_num+1)*FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER);
 
+	    always@(posedge clk)
+		begin
+	        if(first_clock_had_passed && $past(reset)) 
+	        	assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 
+	                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]});	 
+
+			else assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 0);
+		end
 
 		// multi-hop verification for deadlock check
 
@@ -302,7 +310,8 @@ generate
 			begin
 				for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 				begin
-					if(port_num == out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH])
+					if((port_num == out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH])
+						&& flit_data_output_are_valid[node_num][port_num])
 						assert(flit_data_output[node_num][port_num] == node_data_from_cpu[node_num]);
 					
 					else assert(flit_data_output[node_num][port_num] == 0);
