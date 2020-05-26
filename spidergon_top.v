@@ -22,10 +22,10 @@ module spidergon_top
 // See http://www.lisnoc.org/packets.html
 
 // 01 = head_flit , 10 = data_flit (body_flit), 00 = tail_flit, 11 = flit_without_data_payload
-localparam HEAD_FLIT = 'b01;
-localparam HEADER = 'b11; // flit_without_data_payload
-localparam BODY_FLIT = 'b10;
-localparam TAIL_FLIT = 'b00;
+localparam HEAD_FLIT = 2'b01;
+localparam HEADER = 2'b11; // flit_without_data_payload
+localparam BODY_FLIT = 2'b10;
+localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
 parameter DEST_NODE_WIDTH = $clog2(NUM_OF_NODES);

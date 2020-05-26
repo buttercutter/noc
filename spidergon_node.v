@@ -45,10 +45,10 @@ localparam ANTI_CLOCKWISE = 0;
 // See http://www.lisnoc.org/packets.html
 
 // 01 = head_flit , 10 = data_flit (body_flit), 00 = tail_flit, 11 = flit_without_data_payload
-localparam HEAD_FLIT = 'b01;
-localparam HEADER = 'b11; // flit_without_data_payload
-localparam BODY_FLIT = 'b10;
-localparam TAIL_FLIT = 'b00;
+localparam HEAD_FLIT = 2'b01;
+localparam HEADER = 2'b11; // flit_without_data_payload
+localparam BODY_FLIT = 2'b10;
+localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
 localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+FLIT_DATA_WIDTH;
@@ -469,7 +469,40 @@ generate
 
 		// for aligning correctly with 'flit_data_output' in the same clock cycle
 		assign flit_data_output_are_valid[port_num] = valid_output_previously[port_num];	
-	
+
+		localparam NUM_OF_CLOCK_CYCLES_BEFORE_SENDING_NODE_OWN_DATA = 8;
+		reg [$clog2(NUM_OF_CLOCK_CYCLES_BEFORE_SENDING_NODE_OWN_DATA)-1:0] start_sending_node_own_data;
+		
+		always @(posedge clk) 
+		begin
+			if(reset) start_sending_node_own_data <= 0;
+			
+			else if(start_sending_node_own_data != ~0) 
+				start_sending_node_own_data <= start_sending_node_own_data + 1;
+		end
+
+		wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+		wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
+		wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data;
+		
+		`ifdef FORMAL
+			always @(*) assume(dest_node_for_sending_node_own_data == $anyseq); // always less than NUM_OF_NODES
+			always @(*) assume(node_needs_to_send_its_own_data[port_num] == $anyseq);	
+			always @(*) assume(node_own_data[port_num] == 
+								{HEADER, {(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}},
+								 dest_node_for_sending_node_own_data});			
+		`else
+			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #1
+			assign node_needs_to_send_its_own_data[port_num] = (start_sending_node_own_data == ~0); // keeps sending out own data
+			assign node_own_data[port_num] = 
+								{HEADER, {(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}},
+								 dest_node_for_sending_node_own_data};		
+		`endif		
+
+		reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
+
+		always @(posedge clk) 
+			node_needs_to_send_its_own_data_previously[port_num] <= node_needs_to_send_its_own_data[port_num];
 
 		// needs some backpressure logic here
 		assign valid_output[port_num] = (reset) ? 
@@ -477,10 +510,11 @@ generate
 					(direction[port_num] == port_num) && 
 					((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
 
-					(direction[port_num] == port_num) && 
+					((direction[port_num] == port_num) && 
 					(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
 					(valid_output_previously[port_num] && 
-					 (output_flit_type == BODY_FLIT)));
+					 (output_flit_type == BODY_FLIT)))) ||
+					 node_needs_to_send_its_own_data_previously[port_num];
 
 
 		always @(posedge clk)
@@ -498,7 +532,8 @@ generate
 			else if(valid_output[port_num]) begin
 				// needs some backpressure logic here
 				// sends out data from cpu to physical channel
-				flit_data_output[port_num] <= node_data_from_cpu;
+				flit_data_output[port_num] <= (node_needs_to_send_its_own_data[port_num]) ?
+												node_own_data[port_num] : node_data_from_cpu;
 			end
 
 			else flit_data_output[port_num] <=0;
