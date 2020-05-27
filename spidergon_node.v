@@ -486,20 +486,34 @@ generate
 				start_sending_node_own_data <= start_sending_node_own_data + 1;
 		end
 
+		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH-1:0] random_generated_data;
+
 		wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data;
 		
 		`ifdef FORMAL
-			always @(*) assume(dest_node_for_sending_node_own_data == $anyseq); // always less than NUM_OF_NODES
-			always @(*) assume(node_needs_to_send_its_own_data[port_num] == $anyseq);	
-			always @(*) assume(node_own_data[port_num] == 
-								{HEADER, {(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}},
-								 dest_node_for_sending_node_own_data});			
+			always @(posedge clk)
+			begin
+				if(reset) random_generated_data <= 0;
+				 
+				else random_generated_data <= $anyconst;
+			end
+			
+			assign dest_node_for_sending_node_own_data = $anyseq; // always less than NUM_OF_NODES
+			assign node_needs_to_send_its_own_data[port_num] = $anyseq;	
+			assign node_own_data[port_num] = 
+								{HEADER, random_generated_data, dest_node_for_sending_node_own_data};			
 		`else
+			always @(posedge clk)
+			begin
+				if(reset) random_generated_data <= 0;
+				 
+				else random_generated_data <= random_generated_data + 1; // just for randomness
+			end
+				
 			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #1
 			assign node_needs_to_send_its_own_data[port_num] = (&start_sending_node_own_data); // keeps sending out own data
 			assign node_own_data[port_num] = 
-								{HEADER, {(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}},
-								 dest_node_for_sending_node_own_data};		
+								{HEADER, random_generated_data, dest_node_for_sending_node_own_data};		
 		`endif		
 
 		always @(posedge clk) 
