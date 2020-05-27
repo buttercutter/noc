@@ -196,6 +196,11 @@ reg reset_previously;
 always @(posedge clk) reset_previously <= reset;
 
 
+wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
+wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
+
+
 // note that flits from the same data packet cannot be interleaved 
 // among different virtual channels
 // Why ? Because of head flit and tail flit indication
@@ -477,12 +482,10 @@ generate
 		begin
 			if(reset) start_sending_node_own_data <= 0;
 			
-			else if(start_sending_node_own_data != ~0) 
+			else if(~&start_sending_node_own_data)
 				start_sending_node_own_data <= start_sending_node_own_data + 1;
 		end
 
-		wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
-		wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 		wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data;
 		
 		`ifdef FORMAL
@@ -493,13 +496,11 @@ generate
 								 dest_node_for_sending_node_own_data});			
 		`else
 			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #1
-			assign node_needs_to_send_its_own_data[port_num] = (start_sending_node_own_data == ~0); // keeps sending out own data
+			assign node_needs_to_send_its_own_data[port_num] = (&start_sending_node_own_data); // keeps sending out own data
 			assign node_own_data[port_num] = 
 								{HEADER, {(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}},
 								 dest_node_for_sending_node_own_data};		
 		`endif		
-
-		reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
 
 		always @(posedge clk) 
 			node_needs_to_send_its_own_data_previously[port_num] <= node_needs_to_send_its_own_data[port_num];
