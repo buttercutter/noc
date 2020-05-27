@@ -455,8 +455,8 @@ generate
 
 
 		assign dest_node[port_num] = (reset) ? 
-				data_input[(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH] :
-				flit_data_input[port_num][(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH];
+				data_input[(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH] :
+				flit_data_input[port_num][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH];
 
 		// path routing computation block for each input ports
 		router #(NUM_OF_NODES) rt 
@@ -501,7 +501,7 @@ generate
 			assign dest_node_for_sending_node_own_data = $anyseq; // always less than NUM_OF_NODES
 			assign node_needs_to_send_its_own_data[port_num] = $anyseq;	
 			assign node_own_data[port_num] = 
-								{HEADER, random_generated_data, dest_node_for_sending_node_own_data};			
+					{HEADER, dest_node_for_sending_node_own_data, random_generated_data};		
 		`else
 			always @(posedge clk)
 			begin
@@ -513,7 +513,7 @@ generate
 			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #1
 			assign node_needs_to_send_its_own_data[port_num] = (&start_sending_node_own_data); // keeps sending out own data
 			assign node_own_data[port_num] = 
-								{HEADER, random_generated_data, dest_node_for_sending_node_own_data};		
+					{HEADER, dest_node_for_sending_node_own_data, random_generated_data};		
 		`endif		
 
 		always @(posedge clk) 

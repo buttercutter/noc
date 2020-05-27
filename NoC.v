@@ -35,6 +35,7 @@ localparam HEADER = 2'b11; // flit_without_data_payload
 localparam BODY_FLIT = 2'b10;
 localparam TAIL_FLIT = 2'b00;
 
+parameter DEST_NODE_WIDTH = $clog2(NUM_OF_NODES);
 
 spidergon_top 
 #(
@@ -67,7 +68,8 @@ generate
 					if(node_num == 1) // send data from node 1 to node 0
 					begin
 					    data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-					                {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
+					                {HEADER, node_num[DEST_NODE_WIDTH-1:0], 
+						{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}}}; 
 					end 
 					                
 					else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
@@ -93,7 +95,8 @@ generate
 					if((node_num == 1) || (node_num == 2))
 					begin
 					    data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-					                {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
+					                {HEADER, node_num[DEST_NODE_WIDTH-1:0], 
+						{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}}}; 
 					end 
 					                
 					else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
@@ -120,7 +123,8 @@ generate
 					if((node_num == 1) || (node_num == 2) || (node_num == 6) || (node_num == 7))
 					begin
 					    data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-					                {HEADER, node_num[FLIT_DATA_WIDTH-1:0]}; 
+					                {HEADER, node_num[DEST_NODE_WIDTH-1:0], 
+						{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}}}; 
 					end 
 					                
 					else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
@@ -137,7 +141,8 @@ generate
 		    always@(posedge clk)
 			begin
 		        if(reset) data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 
-		                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]};	 
+		                    {HEADER, node_num[DEST_NODE_WIDTH-1:0], 
+						{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH){1'b0}}};	 
 	
 				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 0;
 			end

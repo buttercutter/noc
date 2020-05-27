@@ -262,7 +262,8 @@ generate
 		begin
 	        if(first_clock_had_passed && $past(reset)) 
 	        	assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 
-	                    {HEADER, node_num[FLIT_DATA_WIDTH-1:0]});	 
+	                    {HEADER, node_num[DEST_NODE_WIDTH-1:0], 
+						{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH-1){1'b0}});	 
 
 			else assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 0);
 		end
