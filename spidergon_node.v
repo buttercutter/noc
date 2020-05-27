@@ -510,12 +510,12 @@ generate
 				else random_generated_data <= random_generated_data + 1; // just for randomness
 			end
 				
-			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #1
+			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #0
 			assign node_needs_to_send_its_own_data[port_num] = (&start_sending_node_own_data); // keeps sending out own data
 			assign node_own_data[port_num] = 
 					{HEADER, dest_node_for_sending_node_own_data, random_generated_data+
 					{{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH-NUM_OF_PORTS){1'b0}},
-			 			port_num[NUM_OF_PORTS-1:0]}};		
+			 	  		port_num[NUM_OF_PORTS-1:0]}}; // adding port_num is for data randomness	
 		`endif		
 
 		always @(posedge clk) 
