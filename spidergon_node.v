@@ -321,15 +321,19 @@ generate
 			// (the next node has at least one available, non-reserved vc) OR 
 			// (any of the reserved vc (at next node) has sufficient buffer space)	
 			// AND (to prevent competition of virtual channels for CPU)
-			wire dequeue_en = (((|adjacent_nodes_are_ready[dest_node[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
-								NUM_OF_VIRTUAL_CHANNELS]) || (|adjacent_nodes_vc_are_reserved_and_not_full))
-								&& (!requests_from_multiple_ports ||
-									requests_from_multiple_ports && requests_in_ports_have_been_served[port_num]));
+			wire dequeue_en = (direction[port_num] == STOP) ? 1'b0 :
+				  (((|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
+					NUM_OF_VIRTUAL_CHANNELS]) || (|adjacent_nodes_vc_are_reserved_and_not_full))
+					&& (!requests_from_multiple_ports ||
+						requests_from_multiple_ports &&
+					 	requests_in_ports_have_been_served[port_num]));
 
 
 			assign adjacent_nodes_vc_are_reserved_and_not_full[vc_num] = 
-			  ((!adjacent_nodes_are_ready[dest_node[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]) 
-			  & (!adjacent_node_vc_are_full[dest_node[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
+				(direction[port_num] == STOP) ? 1'b0 :					
+
+			  ((!adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]) 
+			  & (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
 
 
 			assign previous_vc[vc_num] = (reset || vc_is_available[port_num][vc_num]) ? 
@@ -339,7 +343,8 @@ generate
 			// enqueues when 'data is valid' && ((available vc is granted permission) || 
 			// ('vc is reserved' by the same 'head flit')) && '!current vc is full'
 
-			wire enqueue_en = (!reset & reset_previously) ? flit_data_input_are_valid[port_num] && (vc_num == 0) :
+			wire enqueue_en = (!reset & reset_previously) ? 
+						flit_data_input_are_valid[port_num] && (vc_num == 0) :
 
 						flit_data_input_are_valid[port_num] &&
 						((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num]) ||
