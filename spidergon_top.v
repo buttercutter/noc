@@ -262,8 +262,13 @@ generate
 		begin
 	        if(first_clock_had_passed && $past(reset)) 
 	        	assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 
-	                    {HEADER, node_num[DEST_NODE_WIDTH-1:0], 
-						{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH-1){1'b0}}});	 
+			               {
+								HEADER, 
+								{$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, // assume the first VC
+		 				 		node_num[DEST_NODE_WIDTH-1:0], 
+					 			{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
+								 DEST_NODE_WIDTH-1){1'b0}}
+							});	 
 
 			else assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 0);
 		end
@@ -311,9 +316,12 @@ generate
 			begin
 				for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 				begin
-					if((port_num == out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH])
+					if((port_num == 
+						out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH])
 						&& flit_data_output_are_valid[node_num][port_num])
-						assert(flit_data_output[node_num][port_num] == node_data_from_cpu[node_num]);
+
+							assert(flit_data_output[node_num][port_num] ==
+		 							node_data_from_cpu[node_num]);
 					
 					else assert(flit_data_output[node_num][port_num] == 0);
 				end
@@ -324,21 +332,17 @@ generate
 				// use 'b1xx since a node can receive packets from 
 				// all three incoming ports in the same clock cyle
 
-				case (flit_data_input_are_valid[node_num])
+				if(flit_data_input_are_valid[node_num][ACROSS])
+					assert(flit_data_input[node_num][ACROSS][(FLIT_DATA_WIDTH-1) -:
+					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 
-					'bxx1 : assert(flit_data_input[node_num][ACROSS] == 
-									data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH]);
+				if(flit_data_input_are_valid[node_num][CLOCKWISE])
+					assert(flit_data_input[node_num][CLOCKWISE][(FLIT_DATA_WIDTH-1) -:
+					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 
-					'bx1x : assert(flit_data_input[node_num][CLOCKWISE] == 
-									data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH]);
-
-					'b1xx : assert(flit_data_input[node_num][ANTI_CLOCKWISE] == 
-									data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH]);
-
-					//default : assert(1);// don't care when it is 'b000 since no data is received yet
-
-				endcase
-
+				if(flit_data_input_are_valid[node_num][ANTI_CLOCKWISE])
+					assert(flit_data_input[node_num][ANTI_CLOCKWISE][(FLIT_DATA_WIDTH-1) -:
+					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 			end
 
 			// verify the correctness of single-hop routing between two neighbour nodes

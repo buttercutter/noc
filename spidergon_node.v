@@ -455,8 +455,10 @@ generate
 
 
 		assign dest_node[port_num] = (reset) ? 
-				data_input[(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH] :
-				flit_data_input[port_num][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH];
+				data_input[(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -:
+ 							DEST_NODE_WIDTH] :
+				flit_data_input[port_num][(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -:
+ 										   DEST_NODE_WIDTH];
 
 		// path routing computation block for each input ports
 		router #(NUM_OF_NODES) rt 
@@ -486,7 +488,8 @@ generate
 				start_sending_node_own_data <= start_sending_node_own_data + 1;
 		end
 
-		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH-1:0] random_generated_data;
+		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-1:0]
+ 				random_generated_data;
 
 		wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data;
 		
@@ -501,7 +504,12 @@ generate
 			assign dest_node_for_sending_node_own_data = $anyseq; // always less than NUM_OF_NODES
 			assign node_needs_to_send_its_own_data[port_num] = $anyseq;	
 			assign node_own_data[port_num] = 
-					{HEADER, dest_node_for_sending_node_own_data, random_generated_data};		
+					{
+						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
+					 	dest_node_for_sending_node_own_data, 
+
+						random_generated_data
+					};		
 		`else
 			always @(posedge clk)
 			begin
@@ -513,9 +521,15 @@ generate
 			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #0
 			assign node_needs_to_send_its_own_data[port_num] = (&start_sending_node_own_data); // keeps sending out own data
 			assign node_own_data[port_num] = 
-					{HEADER, dest_node_for_sending_node_own_data, random_generated_data+
-					{{(FLIT_TOTAL_WIDTH-HEAD_TAIL-DEST_NODE_WIDTH-NUM_OF_PORTS){1'b0}},
-			 	  		port_num[NUM_OF_PORTS-1:0]}}; // adding port_num is for data randomness	
+					{
+						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
+					 	dest_node_for_sending_node_own_data, 
+
+						random_generated_data+
+						{{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
+ 						DEST_NODE_WIDTH-NUM_OF_PORTS){1'b0}},
+			 	  		port_num[NUM_OF_PORTS-1:0]} // adding port_num is for data randomness
+					}; 	
 		`endif		
 
 		always @(posedge clk) 
