@@ -71,9 +71,10 @@ generate
 			               {
 								HEADER, 
 								{$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, // assume the first VC
-		 				 		node_num[DEST_NODE_WIDTH-1:0], 
+		 				 		node_num[DEST_NODE_WIDTH-1:0], // destination node address
+		 				 		node_num[DEST_NODE_WIDTH-1:0]+{DEST_NODE_WIDTH{1'b1}}, // source node address
 					 			{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
-								 DEST_NODE_WIDTH){1'b0}}
+								 DEST_NODE_WIDTH-DEST_NODE_WIDTH){1'b0}}
 							};
 					end 
 					                
@@ -103,9 +104,10 @@ generate
 			               {
 								HEADER, 
 								{$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, // assume the first VC
-		 				 		node_num[DEST_NODE_WIDTH-1:0], 
+		 				 		node_num[DEST_NODE_WIDTH-1:0], // destination node address
+		 				 		node_num[DEST_NODE_WIDTH-1:0]+{DEST_NODE_WIDTH{1'b1}}, // source node address
 					 			{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
-								 DEST_NODE_WIDTH){1'b0}}
+								 DEST_NODE_WIDTH-DEST_NODE_WIDTH){1'b0}}
 							};
 					end 
 					                
@@ -136,9 +138,10 @@ generate
 			               {
 								HEADER, 
 								{$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, // assume the first VC
-		 				 		node_num[DEST_NODE_WIDTH-1:0], 
+		 				 		node_num[DEST_NODE_WIDTH-1:0], // destination node address
+		 				 		node_num[DEST_NODE_WIDTH-1:0]+{DEST_NODE_WIDTH{1'b1}}, // source node address
 					 			{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
-								 DEST_NODE_WIDTH){1'b0}}
+								 DEST_NODE_WIDTH-DEST_NODE_WIDTH){1'b0}}
 							};	
 					end 
 					                
@@ -159,9 +162,10 @@ generate
 			               {
 								HEADER, 
 								{$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, // assume the first VC
-		 				 		node_num[DEST_NODE_WIDTH-1:0], 
+		 				 		node_num[DEST_NODE_WIDTH-1:0], // destination node address
+		 				 		node_num[DEST_NODE_WIDTH-1:0]+{DEST_NODE_WIDTH{1'b1}}, // source node address
 					 			{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
-								 DEST_NODE_WIDTH){1'b0}}
+								 DEST_NODE_WIDTH-DEST_NODE_WIDTH){1'b0}}
 							};	
 	
 				else data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] <= 0;

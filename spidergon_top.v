@@ -329,9 +329,6 @@ generate
 
 			else if(packet_arrived_at_dest[node_num]) begin // reaching destination node
 
-				// use 'b1xx since a node can receive packets from 
-				// all three incoming ports in the same clock cyle
-
 				if(flit_data_input_are_valid[node_num][ACROSS])
 					assert(flit_data_input[node_num][ACROSS][(FLIT_DATA_WIDTH-1) -:
 					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);

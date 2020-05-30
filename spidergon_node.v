@@ -209,10 +209,10 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 // let HEAD_TAIL = 2  to indicate flit type
 // let FLIT_TOTAL_WIDTH = HEAD_TAIL + FLIT_DATA_WIDTH
 
-// 18-bit head flit format as follows: {01, prev_vc, destination_node, 12 bits of data_payload}
-// prev_vc consumes 1 bit, destination_node consumes 3 bits (8 nodes in total), 
-// so we are left with 12 bits in the head flit
-// these 12 bits could be data payload as well
+// 18-bit head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
+// prev_vc consumes 1 bit, destination_node or source node consume 3 bits (8 nodes in total), 
+// so we are left with 9 bits in the head flit
+// these 9 bits could be data payload as well
 
 // 18-bit body flit format as follows: {10, prev_vc, 15 bits of data_payload}
 // 18-bit tail flit format as follows: {00, prev_vc, 15 bits of data_payload}
@@ -493,7 +493,7 @@ generate
 				start_sending_node_own_data <= start_sending_node_own_data + 1;
 		end
 
-		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-1:0]
+		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-1:0]
  				random_generated_data;
 
 		wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data;
@@ -511,7 +511,8 @@ generate
 			assign node_own_data[port_num] = 
 					{
 						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
-					 	dest_node_for_sending_node_own_data, 
+					 	dest_node_for_sending_node_own_data, // destination node
+						current_node, // source node
 
 						random_generated_data
 					};		
@@ -528,11 +529,12 @@ generate
 			assign node_own_data[port_num] = 
 					{
 						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
-					 	dest_node_for_sending_node_own_data, 
-
+					 	dest_node_for_sending_node_own_data, // destination node
+						current_node, // source node
+						
 						random_generated_data+
 						{{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
- 						DEST_NODE_WIDTH-NUM_OF_PORTS){1'b0}},
+ 						DEST_NODE_WIDTH-DEST_NODE_WIDTH-NUM_OF_PORTS){1'b0}},
 			 	  		port_num[NUM_OF_PORTS-1:0]} // adding port_num is for data randomness
 					}; 	
 		`endif		
