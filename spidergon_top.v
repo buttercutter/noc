@@ -275,7 +275,7 @@ generate
 
 		// multi-hop verification for deadlock check
 
-		integer dest_ports, source_node_num;
+		integer dest_ports;
 
 		always @(posedge clk)
 		begin
@@ -365,6 +365,82 @@ endgenerate
 
 // multiple data packets traversing the NoC and reached their destination successfully
 always @(posedge clk) cover(&packet_arrived_at_dest);
+
+
+/* deadlock check */
+localparam MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS = 8;
+reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)-1:0] 
+			 num_of_in_progress_data_packets [NUM_OF_NODES-1:0];
+
+reg possible_deadlock_scenario [NUM_OF_NODES-1:0];
+
+generate
+	genvar node_num;
+
+	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
+	begin : DEADLOCK
+	
+		always @(posedge clk)
+		begin
+			if(reset) possible_deadlock_scenario[node_num] <= 0;
+			
+			else if(num_of_in_progress_data_packets[node_num] >= MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)
+				possible_deadlock_scenario[node_num] <= 1;
+		end
+
+		always @(*) cover(possible_deadlock_scenario[node_num] == 0); //trying to get waveform in case of deadlock
+	end
+endgenerate
+
+
+reg [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
+reg [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
+
+integer source_node_num, port_num;
+
+always @(*)
+begin
+	// sum up the number of data packet that originate from source node, and ends in destination node
+	// this is to track any in-progress data packets that had been sent out but not received yet
+
+	for (source_node_num = 0; source_node_num < NUM_OF_NODES; source_node_num = source_node_num + 1) 
+	begin
+		for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
+		begin
+			if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
+		
+			else begin
+			
+				/* source node had just sent a data packet */
+
+				flit_data_output_contains_header[source_node_num*port_num +: port_num] =
+				((flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
+				(flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
+	
+				if(flit_data_output_contains_header[source_node_num*port_num +: port_num] && 
+				   (flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1) -: 2*$clog2(NUM_OF_NODES)] 
+					 == source_node_num))
+				  
+			  			num_of_in_progress_data_packets[source_node_num] =
+			  			num_of_in_progress_data_packets[source_node_num] + 1;
+		  			
+
+				/* destination node had just received a data packet */
+
+				flit_data_input_contains_header[source_node_num*port_num +: port_num] =
+				((flit_data_input[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
+				(flit_data_input[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
+				
+				if(flit_data_input_contains_header[source_node_num*port_num +: port_num] &&
+				   (flit_data_input[source_node_num][port_num][FLIT_DATA_WIDTH -: 2*$clog2(NUM_OF_NODES)] ==
+				   source_node_num) && (packet_arrived_at_dest[source_node_num]))
+
+			  			num_of_in_progress_data_packets[source_node_num] =
+			  			num_of_in_progress_data_packets[source_node_num] - 1;
+			end
+	  	end
+	end
+end
 
 `endif
 
