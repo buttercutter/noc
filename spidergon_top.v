@@ -384,17 +384,20 @@ generate
 		begin
 			if(reset) possible_deadlock_scenario[node_num] <= 0;
 			
-			else if(num_of_in_progress_data_packets[node_num] >= MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)
+			else if(num_of_in_progress_data_packets[node_num] >= MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS-1)
 				possible_deadlock_scenario[node_num] <= 1;
 		end
 
-		always @(*) cover(possible_deadlock_scenario[node_num] == 0); //trying to get waveform in case of deadlock
+		always @(posedge clk) 
+			cover(possible_deadlock_scenario[node_num]); // trying to get waveform in case of deadlock
 	end
 endgenerate
 
 
 reg [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
 reg [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
+
+reg node_sending_data_to_other_nodes;
 
 integer source_node_num, port_num;
 
@@ -407,9 +410,13 @@ begin
 	begin
 		for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
 		begin
+			node_sending_data_to_other_nodes =
+				flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1) -: 2*$clog2(NUM_OF_NODES)] !=
+				flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1) -: $clog2(NUM_OF_NODES)];
+		
 			if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
 		
-			else begin
+			else if(node_sending_data_to_other_nodes) begin
 			
 				/* source node had just sent a data packet */
 
