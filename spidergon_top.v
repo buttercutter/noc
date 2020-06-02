@@ -372,6 +372,9 @@ localparam MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS = 8;
 reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)-1:0] 
 			 num_of_in_progress_data_packets [NUM_OF_NODES-1:0];
 
+reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)-1:0] 
+			 current_num_of_in_progress_data_packets [NUM_OF_NODES-1:0];
+
 reg possible_deadlock_scenario [NUM_OF_NODES-1:0];
 
 generate
@@ -379,7 +382,14 @@ generate
 
 	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
 	begin : DEADLOCK
-	
+
+		always @(posedge clk)
+		begin
+			if(reset) current_num_of_in_progress_data_packets[node_num] <= 0;
+		
+			current_num_of_in_progress_data_packets[node_num] <= num_of_in_progress_data_packets[node_num];
+		end
+
 		always @(posedge clk)
 		begin
 			if(reset) possible_deadlock_scenario[node_num] <= 0;
@@ -399,6 +409,13 @@ reg [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
 
 reg node_sending_data_to_other_nodes;
 
+
+//reg destination_address_in_input_flit;  // destionation node
+reg source_address_in_input_flit; // source node
+
+reg destination_address_in_output_flit;  // destionation node
+reg source_address_in_output_flit; // source node
+
 integer source_node_num, port_num;
 
 always @(*)
@@ -410,13 +427,31 @@ begin
 	begin
 		for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
 		begin
-			node_sending_data_to_other_nodes =
-				flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1) -: 2*$clog2(NUM_OF_NODES)] !=
+		
+			// to avoid logic loop error during synthesis
+			num_of_in_progress_data_packets[source_node_num] = 
+			current_num_of_in_progress_data_packets[source_node_num];
+
+
+			// head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
+
+			destination_address_in_output_flit = 
 				flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1) -: $clog2(NUM_OF_NODES)];
+
+			source_address_in_output_flit = 
+				flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -:
+				 											$clog2(NUM_OF_NODES)];
+
+			source_address_in_input_flit = 
+				flit_data_input[source_node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -: 
+															$clog2(NUM_OF_NODES)];
+
+			node_sending_data_to_other_nodes =
+				source_address_in_output_flit != destination_address_in_output_flit;
 		
-			if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
+			//if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
 		
-			else if(node_sending_data_to_other_nodes) begin
+			//if(node_sending_data_to_other_nodes) begin
 			
 				/* source node had just sent a data packet */
 
@@ -425,8 +460,7 @@ begin
 				(flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 	
 				if(flit_data_output_contains_header[source_node_num*port_num +: port_num] && 
-				   (flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1) -: 2*$clog2(NUM_OF_NODES)] 
-					 == source_node_num))
+				   (source_address_in_input_flit == source_node_num))
 				  
 			  			num_of_in_progress_data_packets[source_node_num] =
 			  			num_of_in_progress_data_packets[source_node_num] + 1;
@@ -439,12 +473,11 @@ begin
 				(flit_data_input[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 				
 				if(flit_data_input_contains_header[source_node_num*port_num +: port_num] &&
-				   (flit_data_input[source_node_num][port_num][FLIT_DATA_WIDTH -: 2*$clog2(NUM_OF_NODES)] ==
-				   source_node_num) && (packet_arrived_at_dest[source_node_num]))
+				   (source_address_in_input_flit == source_node_num) && (packet_arrived_at_dest[source_node_num]))
 
 			  			num_of_in_progress_data_packets[source_node_num] =
 			  			num_of_in_progress_data_packets[source_node_num] - 1;
-			end
+			//end
 	  	end
 	end
 end
