@@ -368,11 +368,11 @@ always @(posedge clk) cover(&packet_arrived_at_dest);
 
 
 /* deadlock check */
-localparam MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS = 8;
-reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)-1:0] 
+localparam MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS = 32;
+reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS):0] 
 			 num_of_in_progress_data_packets [NUM_OF_NODES-1:0];
 
-reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)-1:0] 
+reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS):0] 
 			 current_num_of_in_progress_data_packets [NUM_OF_NODES-1:0];
 
 reg possible_deadlock_scenario [NUM_OF_NODES-1:0];
@@ -382,6 +382,8 @@ generate
 
 	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
 	begin : DEADLOCK
+
+		initial possible_deadlock_scenario[node_num] = 0;
 
 		always @(posedge clk)
 		begin
@@ -394,12 +396,15 @@ generate
 		begin
 			if(reset) possible_deadlock_scenario[node_num] <= 0;
 			
-			else if(num_of_in_progress_data_packets[node_num] >= MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS-1)
+			else if(num_of_in_progress_data_packets[node_num] >= MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)
 				possible_deadlock_scenario[node_num] <= 1;
 		end
 
 		always @(posedge clk) 
+		begin
+			assert(possible_deadlock_scenario[node_num]);
 			cover(possible_deadlock_scenario[node_num]); // trying to get waveform in case of deadlock
+		end
 	end
 endgenerate
 
@@ -460,7 +465,7 @@ begin
 				(flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 	
 				if(flit_data_output_contains_header[source_node_num*port_num +: port_num] && 
-				   (source_address_in_input_flit == source_node_num))
+				   (source_address_in_output_flit == source_node_num))
 				  
 			  			num_of_in_progress_data_packets[source_node_num] =
 			  			num_of_in_progress_data_packets[source_node_num] + 1;
