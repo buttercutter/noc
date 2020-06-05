@@ -384,6 +384,7 @@ generate
 	begin : DEADLOCK
 
 		initial possible_deadlock_scenario[node_num] = 0;
+		initial num_of_in_progress_data_packets[node_num] = 0;
 
 		always @(posedge clk)
 		begin
