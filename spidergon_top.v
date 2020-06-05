@@ -402,7 +402,7 @@ generate
 
 		always @(posedge clk) 
 		begin
-			assert(possible_deadlock_scenario[node_num]);
+			assert(possible_deadlock_scenario[node_num] == 0);
 			cover(possible_deadlock_scenario[node_num]); // trying to get waveform in case of deadlock
 		end
 	end
