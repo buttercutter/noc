@@ -460,10 +460,8 @@ generate
 
 
 		assign dest_node[port_num] = (reset) ? 
-				data_input[(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -:
- 							DEST_NODE_WIDTH] :
-				flit_data_input[port_num][(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -:
- 										   DEST_NODE_WIDTH];
+				data_input[(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH] :
+				flit_data_input[port_num][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH];
 
 		// path routing computation block for each input ports
 		router #(NUM_OF_NODES) rt 
