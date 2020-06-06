@@ -80,13 +80,13 @@ initial first_clock_had_passed = 0;
 
 always @(posedge clk) first_clock_had_passed <= 1;
 
-wire [NUM_OF_NODES-1:0] packet_arrived_at_dest;
+reg [NUM_OF_PORTS-1:0] packet_arrived_at_dest [NUM_OF_NODES-1:0];
 
 reg [NUM_OF_NODES-1:0] data_packet_contains_header;
-reg [NUM_OF_NODES-1:0] destination_address_matches;
+reg [NUM_OF_PORTS-1:0] destination_address_matches [NUM_OF_NODES-1:0];
 
 initial data_packet_contains_header = 0;
-initial destination_address_matches = 0;
+//initial destination_address_matches = 0;
 
 
 wire [NUM_OF_PORTS*HEAD_TAIL-1:0] input_flit_type [NUM_OF_NODES-1:0];
@@ -295,27 +295,27 @@ generate
 
 
 		always @(*)
-		begin
-			if(reset) destination_address_matches[node_num] = 0;
-	
-			else begin
+		begin							
+			for(dest_ports = 0; dest_ports < NUM_OF_PORTS; dest_ports = dest_ports + 1)
+			begin
+				destination_address_matches[node_num][dest_ports] = 0; // try to reset before checking
 			
-				destination_address_matches[node_num] = 0; // try to reset before checking
-					
-				for(dest_ports = 0; dest_ports < NUM_OF_PORTS; dest_ports = dest_ports + 1)
-				begin
-					if((node_num == flit_data_input[node_num][dest_ports][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH])
-						&& flit_data_input_are_valid[node_num][dest_ports]
-					  )
+				if((node_num == flit_data_input[node_num][dest_ports][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH])
+					&& flit_data_input_are_valid[node_num][dest_ports])
 
-						destination_address_matches[node_num] = 1;
-				end
+					destination_address_matches[node_num][dest_ports] = 1;
 			end
 		end
 
-
-		assign packet_arrived_at_dest[node_num] = (first_clock_had_passed &&
-				(data_packet_contains_header[node_num]) && (destination_address_matches[node_num]));
+		always @(*) 
+		begin
+			for(dest_ports = 0; dest_ports < NUM_OF_PORTS; dest_ports = dest_ports + 1)
+			begin
+				packet_arrived_at_dest[node_num][dest_ports] = (first_clock_had_passed &&
+								(data_packet_contains_header[node_num]) && 
+								(destination_address_matches[node_num][dest_ports]));
+			end
+		end
 
 		integer port_num;
 
@@ -336,17 +336,18 @@ generate
 				end
 			end
 
-			else if(packet_arrived_at_dest[node_num]) begin // reaching destination node
+			else if(|packet_arrived_at_dest[node_num]) begin // reaching destination node
+				// 'case()' is not used here because multiple data packets could arrive in the same clock cycle
 
-				if(flit_data_input_are_valid[node_num][ACROSS])
+				if(packet_arrived_at_dest[node_num][ACROSS])
 					assert(flit_data_input[node_num][ACROSS][(FLIT_DATA_WIDTH-1) -:
 					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 
-				if(flit_data_input_are_valid[node_num][CLOCKWISE])
+				if(packet_arrived_at_dest[node_num][CLOCKWISE])
 					assert(flit_data_input[node_num][CLOCKWISE][(FLIT_DATA_WIDTH-1) -:
 					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 
-				if(flit_data_input_are_valid[node_num][ANTI_CLOCKWISE])
+				if(packet_arrived_at_dest[node_num][ANTI_CLOCKWISE])
 					assert(flit_data_input[node_num][ANTI_CLOCKWISE][(FLIT_DATA_WIDTH-1) -:
 					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 			end
@@ -360,21 +361,20 @@ generate
 		end
 
 		// single data packet traversing the NoC and reached its destination successfully
-		always @(posedge clk) cover(packet_arrived_at_dest[node_num]);
+		always @(posedge clk) cover(|packet_arrived_at_dest[node_num]);			
+		always @(posedge clk) cover(|destination_address_matches[node_num]);
 		always @(posedge clk) cover(data_packet_contains_header[node_num]);
-		//always @(posedge clk) cover(destination_address_matches[node_num]);
+		
+		// multiple data packets traversing the NoC and reached their destination successfully
+		always @(posedge clk) cover(&packet_arrived_at_dest[node_num]);
+		
 		`endif
-
 	end
 
 endgenerate
 
 
 `ifdef FORMAL
-
-// multiple data packets traversing the NoC and reached their destination successfully
-always @(posedge clk) cover(&packet_arrived_at_dest);
-
 
 /* deadlock check */
 localparam MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS = 32;
