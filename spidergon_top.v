@@ -317,7 +317,7 @@ generate
 				for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 				begin
 					if((port_num == 
-						out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH])
+					   $past(out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH]))
 						&& flit_data_output_are_valid[node_num][port_num])
 
 							assert(flit_data_output[node_num][port_num] ==
