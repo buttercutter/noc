@@ -196,6 +196,9 @@ reg reset_previously;
 always @(posedge clk) reset_previously <= reset;
 
 
+// For each node, every ports could send different data in the same clock cycle to different destination nodes
+wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+
 wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
 wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
@@ -469,7 +472,10 @@ generate
 			//.clk(clk),
 
 			// see the math logic in router.v on why we set it to 'current_node' for tail_flit
-			.dest_node((stop_flow) ? current_node : dest_node[port_num]), 
+			.dest_node((stop_flow && !node_needs_to_send_its_own_data[port_num]) ? 
+							current_node :
+							(node_needs_to_send_its_own_data[port_num]) ?
+							 dest_node_for_sending_node_own_data[port_num] : dest_node[port_num]), 
 			.current_node(current_node), 
 			.direction(direction[port_num])
 		);
@@ -494,7 +500,7 @@ generate
 		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-1:0]
  				random_generated_data;
 
-		wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data;
+
 		
 		`ifdef FORMAL
 			always @(posedge clk)
@@ -504,12 +510,12 @@ generate
 				else random_generated_data <= $anyconst;
 			end
 			
-			assign dest_node_for_sending_node_own_data = $anyseq; // always less than NUM_OF_NODES
-			assign node_needs_to_send_its_own_data[port_num] = $anyseq;	
+			assign dest_node_for_sending_node_own_data[port_num] = $anyseq; // always less than NUM_OF_NODES
+			assign node_needs_to_send_its_own_data[port_num] = $anyseq;	// depends on dest node of data packets
 			assign node_own_data[port_num] = 
 					{
 						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
-					 	dest_node_for_sending_node_own_data, // destination node
+					 	dest_node_for_sending_node_own_data[port_num], // destination node
 						current_node, // source node
 
 						random_generated_data
@@ -522,12 +528,12 @@ generate
 				else random_generated_data <= random_generated_data + 1; // just for randomness
 			end
 				
-			assign dest_node_for_sending_node_own_data = 0; // keeps sending to node #0
+			assign dest_node_for_sending_node_own_data[port_num] = 0; // keeps sending to node #0
 			assign node_needs_to_send_its_own_data[port_num] = (&start_sending_node_own_data); // keeps sending out own data
 			assign node_own_data[port_num] = 
 					{
 						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
-					 	dest_node_for_sending_node_own_data, // destination node
+					 	dest_node_for_sending_node_own_data[port_num], // destination node
 						current_node, // source node
 						
 						random_generated_data+
@@ -549,8 +555,7 @@ generate
 					((direction[port_num] == port_num) && 
 					(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
 					(valid_output_previously[port_num] && 
-					 (output_flit_type == BODY_FLIT)))) ||
-					 node_needs_to_send_its_own_data_previously[port_num];
+					 (output_flit_type == BODY_FLIT)) || node_needs_to_send_its_own_data_previously[port_num]));
 
 
 		always @(posedge clk)

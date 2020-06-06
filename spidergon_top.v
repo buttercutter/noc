@@ -298,10 +298,23 @@ generate
 		begin
 			if(reset) destination_address_matches[node_num] = 0;
 	
-			else if(node_num == 
-						data_input[((node_num+1)*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH])
+			else begin
+			
+				destination_address_matches[node_num] = 0; // try to reset before checking
+			
+				if(node_num == 
+					 data_input[((node_num+1)*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -:
+					 DEST_NODE_WIDTH])
 						
-				destination_address_matches[node_num] = 1;
+					destination_address_matches[node_num] = 1;
+					
+				for(dest_ports = 0; dest_ports < NUM_OF_PORTS; dest_ports = dest_ports + 1)
+				begin
+					if(node_num == flit_data_input[node_num][dest_ports][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH])
+
+						destination_address_matches[node_num] = 1;
+				end
+			end
 		end
 
 
