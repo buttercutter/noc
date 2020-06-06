@@ -51,7 +51,7 @@ localparam BODY_FLIT = 2'b10;
 localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
-localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+FLIT_DATA_WIDTH;
+localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DATA_WIDTH;
 
 
 localparam NUM_OF_PORTS = 3; // clockwise, anti-clockwise, across

@@ -29,7 +29,7 @@ localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
 parameter DEST_NODE_WIDTH = $clog2(NUM_OF_NODES);
-localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+FLIT_DATA_WIDTH;
+localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DATA_WIDTH;
 
 localparam DIRECTION_WIDTH = 2; // $clog2(NUM_OF_PORTS)
 localparam NUM_OF_PORTS = 3; // clockwise, anti-clockwise, across
@@ -277,9 +277,9 @@ generate
 
 		integer dest_ports;
 
-		always @(posedge clk)
+		always @(*)
 		begin
-			if(reset) data_packet_contains_header[node_num] <= 0;
+			if(reset) data_packet_contains_header[node_num] = 0;
 
 			else begin
 
@@ -288,20 +288,20 @@ generate
 					if((input_flit_type[node_num][dest_ports*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT) ||
 					   (input_flit_type[node_num][dest_ports*HEAD_TAIL +: HEAD_TAIL] == HEADER))
 
-						data_packet_contains_header[node_num] <= 1;
+						data_packet_contains_header[node_num] = 1;
 				end
 			end
 		end
 
 
-		always @(posedge clk)
+		always @(*)
 		begin
-			if(reset) destination_address_matches[node_num] <= 0;
+			if(reset) destination_address_matches[node_num] = 0;
 	
 			else if(node_num == 
 						data_input[((node_num+1)*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH])
 						
-				destination_address_matches[node_num] <= 1;
+				destination_address_matches[node_num] = 1;
 		end
 
 

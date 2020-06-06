@@ -23,7 +23,7 @@ wire [FLIT_DATA_WIDTH-1:0] data_output;
 assign done = (data_output == 1); // just to avoid EDA tool optimizes away NoC design logic
 
 localparam HEAD_TAIL = 2;
-localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+FLIT_DATA_WIDTH;
+localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DATA_WIDTH;
 
 // the most significant two bits are to indicate head and/or tail flits,
 // followed by dest_node and flit_data_payload
