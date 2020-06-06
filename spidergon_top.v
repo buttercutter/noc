@@ -305,7 +305,7 @@ generate
 				for(dest_ports = 0; dest_ports < NUM_OF_PORTS; dest_ports = dest_ports + 1)
 				begin
 					if((node_num == flit_data_input[node_num][dest_ports][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH])
-						&& flit_data_input_are_valid[node_num][dest_port]
+						&& flit_data_input_are_valid[node_num][dest_ports]
 					  )
 
 						destination_address_matches[node_num] = 1;
