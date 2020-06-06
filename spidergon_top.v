@@ -475,7 +475,8 @@ begin
 				(flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 	
 				if(flit_data_output_contains_header[source_node_num*port_num +: port_num] && 
-				   (source_address_in_output_flit == source_node_num))
+				   (source_address_in_output_flit == source_node_num) &&
+				    flit_data_output_are_valid[source_node_num][port_num])
 				  
 			  			num_of_in_progress_data_packets[source_node_num] =
 			  			num_of_in_progress_data_packets[source_node_num] + 1;
@@ -488,7 +489,9 @@ begin
 				(flit_data_input[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 				
 				if(flit_data_input_contains_header[source_node_num*port_num +: port_num] &&
-				   (source_address_in_input_flit == source_node_num) && (packet_arrived_at_dest[source_node_num]))
+				   (source_address_in_input_flit == source_node_num) && 
+				   flit_data_input_are_valid[source_node_num][port_num] &&
+				   (packet_arrived_at_dest[source_node_num]))
 
 			  			num_of_in_progress_data_packets[source_node_num] =
 			  			num_of_in_progress_data_packets[source_node_num] - 1;
