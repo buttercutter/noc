@@ -475,11 +475,11 @@ begin
 			
 				/* source node had just sent a data packet */
 
-				flit_data_output_contains_header[source_node_num*port_num +: port_num] =
+				flit_data_output_contains_header[source_node_num*NUM_OF_PORTS + port_num] =
 				((flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
 				(flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 	
-				if(flit_data_output_contains_header[source_node_num*port_num +: port_num] && 
+				if(flit_data_output_contains_header[source_node_num*NUM_OF_PORTS + port_num] && 
 				   (source_address_in_output_flit == source_node_num) &&
 				    flit_data_output_are_valid[source_node_num][port_num])
 				  
@@ -489,11 +489,11 @@ begin
 
 				/* destination node had just received a data packet */
 
-				flit_data_input_contains_header[other_nodes_num*port_num +: port_num] =
+				flit_data_input_contains_header[other_nodes_num*NUM_OF_PORTS + port_num] =
 				((flit_data_input[other_nodes_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
 				(flit_data_input[other_nodes_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 				
-				if(flit_data_input_contains_header[other_nodes_num*port_num +: port_num] &&
+				if(flit_data_input_contains_header[other_nodes_num*NUM_OF_PORTS + port_num] &&
 				   (source_address_in_input_flit == source_node_num) && 
 				   flit_data_input_are_valid[other_nodes_num][port_num] &&
 				   (packet_arrived_at_dest[source_node_num]))
