@@ -426,6 +426,8 @@ wire [NUM_OF_PORTS-1:0] source_address_in_output_flit [NUM_OF_NODES-1:0]; // sou
 wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
 wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
 
+wire [NUM_OF_PORTS-1:0] node_sending_data_to_other_nodes [NUM_OF_NODES-1:0];
+
 generate
 
 	genvar node_num, port_num;
@@ -456,12 +458,15 @@ generate
 			assign source_address_in_input_flit[node_num][port_num] = 
 						flit_data_input[node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -: 
 															$clog2(NUM_OF_NODES)];
+															
+			assign node_sending_data_to_other_nodes[node_num][port_num] =
+						source_address_in_output_flit[source_node_num][port_num] !=
+						destination_address_in_output_flit[source_node_num][port_num];
 		end
 	end
 	
 endgenerate
 
-reg node_sending_data_to_other_nodes;
 
 integer source_node_num, other_nodes_num, port_nums;
 
@@ -483,14 +488,10 @@ begin
 			// to avoid logic loop error during synthesis
 			num_of_in_progress_data_packets[source_node_num] = 
 			current_num_of_in_progress_data_packets[source_node_num];
-
-			node_sending_data_to_other_nodes =
-				source_address_in_output_flit[source_node_num][port_nums] !=
-				destination_address_in_output_flit[source_node_num][port_nums];
 		
 			//if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
 		
-			//if(node_sending_data_to_other_nodes) begin
+			//if(node_sending_data_to_other_nodes[source_node_num][port_nums]) begin
 			
 				/* source node had just sent a data packet */
 
