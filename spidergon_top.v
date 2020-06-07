@@ -419,19 +419,51 @@ generate
 endgenerate
 
 
-reg [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
-reg [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
+wire [NUM_OF_PORTS-1:0] source_address_in_input_flit [NUM_OF_NODES-1:0]; // source node
+wire [NUM_OF_PORTS-1:0] destination_address_in_output_flit [NUM_OF_NODES-1:0];  // destination node
+wire [NUM_OF_PORTS-1:0] source_address_in_output_flit [NUM_OF_NODES-1:0]; // source node
+
+wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
+wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
+
+generate
+
+	genvar node_num, port_num;
+
+	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
+	begin : NODES
+	
+		for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
+		begin : PORTS
+		
+			assign flit_data_output_contains_header[node_num*NUM_OF_PORTS + port_num] =
+						((flit_data_output[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
+						(flit_data_output[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
+				
+			assign flit_data_input_contains_header[node_num*NUM_OF_PORTS + port_num] =
+						((flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
+						(flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
+						
+			// head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
+
+			assign destination_address_in_output_flit[node_num][port_num] = 
+						flit_data_output[node_num][port_num][(FLIT_DATA_WIDTH-1) -: $clog2(NUM_OF_NODES)];
+
+			assign source_address_in_output_flit[node_num][port_num] = 
+						flit_data_output[node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -:
+				 											$clog2(NUM_OF_NODES)];
+
+			assign source_address_in_input_flit[node_num][port_num] = 
+						flit_data_input[node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -: 
+															$clog2(NUM_OF_NODES)];
+		end
+	end
+	
+endgenerate
 
 reg node_sending_data_to_other_nodes;
 
-
-//reg destination_address_in_input_flit;  // destination node
-reg source_address_in_input_flit; // source node
-
-reg destination_address_in_output_flit;  // destination node
-reg source_address_in_output_flit; // source node
-
-integer source_node_num, other_nodes_num, port_num;
+integer source_node_num, other_nodes_num, port_nums;
 
 always @(*)
 begin
@@ -445,29 +477,16 @@ begin
 	  for (other_nodes_num = 0; other_nodes_num < NUM_OF_NODES; other_nodes_num = other_nodes_num + 1) 
 	  begin
 	  
-		for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
+		for(port_nums = 0; port_nums < NUM_OF_PORTS; port_nums = port_nums + 1)
 		begin
 		
 			// to avoid logic loop error during synthesis
 			num_of_in_progress_data_packets[source_node_num] = 
 			current_num_of_in_progress_data_packets[source_node_num];
 
-
-			// head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
-
-			destination_address_in_output_flit = 
-				flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1) -: $clog2(NUM_OF_NODES)];
-
-			source_address_in_output_flit = 
-				flit_data_output[source_node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -:
-				 											$clog2(NUM_OF_NODES)];
-
-			source_address_in_input_flit = 
-				flit_data_input[other_nodes_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -: 
-															$clog2(NUM_OF_NODES)];
-
 			node_sending_data_to_other_nodes =
-				source_address_in_output_flit != destination_address_in_output_flit;
+				source_address_in_output_flit[source_node_num][port_nums] !=
+				destination_address_in_output_flit[source_node_num][port_nums];
 		
 			//if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
 		
@@ -475,27 +494,19 @@ begin
 			
 				/* source node had just sent a data packet */
 
-				flit_data_output_contains_header[source_node_num*NUM_OF_PORTS + port_num] =
-				((flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
-				(flit_data_output[source_node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
-	
-				if(flit_data_output_contains_header[source_node_num*NUM_OF_PORTS + port_num] && 
-				   (source_address_in_output_flit == source_node_num) &&
-				    flit_data_output_are_valid[source_node_num][port_num])
+				if(flit_data_output_contains_header[source_node_num*NUM_OF_PORTS + port_nums] && 
+				   (source_address_in_output_flit[source_node_num][port_nums] == source_node_num) &&
+				    flit_data_output_are_valid[source_node_num][port_nums])
 				  
 			  			num_of_in_progress_data_packets[source_node_num] =
 			  			num_of_in_progress_data_packets[source_node_num] + 1;
 		  			
 
 				/* destination node had just received a data packet */
-
-				flit_data_input_contains_header[other_nodes_num*NUM_OF_PORTS + port_num] =
-				((flit_data_input[other_nodes_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
-				(flit_data_input[other_nodes_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
 				
-				if(flit_data_input_contains_header[other_nodes_num*NUM_OF_PORTS + port_num] &&
-				   (source_address_in_input_flit == source_node_num) && 
-				   flit_data_input_are_valid[other_nodes_num][port_num] &&
+				if(flit_data_input_contains_header[other_nodes_num*NUM_OF_PORTS + port_nums] &&
+				   (source_address_in_input_flit[source_node_num][port_nums] == source_node_num) && 
+				   flit_data_input_are_valid[other_nodes_num][port_nums] &&
 				   (packet_arrived_at_dest[source_node_num]))
 
 			  			num_of_in_progress_data_packets[source_node_num] =
