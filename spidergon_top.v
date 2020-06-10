@@ -423,7 +423,7 @@ wire [NUM_OF_PORTS-1:0] source_address_in_input_flit [NUM_OF_NODES-1:0]; // sour
 wire [NUM_OF_PORTS-1:0] destination_address_in_output_flit [NUM_OF_NODES-1:0];  // destination node
 wire [NUM_OF_PORTS-1:0] source_address_in_output_flit [NUM_OF_NODES-1:0]; // source node
 
-wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
+(* keep *) wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
 wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
 
 wire [NUM_OF_PORTS-1:0] node_sending_data_to_other_nodes [NUM_OF_NODES-1:0];
