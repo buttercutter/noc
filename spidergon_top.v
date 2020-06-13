@@ -435,6 +435,8 @@ generate
 	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
 	begin : NODES
 	
+		initial node_data_from_cpu[node_num] = 0;
+	
 		for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
 		begin : PORTS
 		
