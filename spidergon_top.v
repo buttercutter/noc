@@ -419,9 +419,9 @@ generate
 endgenerate
 
 
-wire [NUM_OF_PORTS-1:0] source_address_in_input_flit [NUM_OF_NODES-1:0]; // source node
-wire [NUM_OF_PORTS-1:0] destination_address_in_output_flit [NUM_OF_NODES-1:0];  // destination node
-wire [NUM_OF_PORTS-1:0] source_address_in_output_flit [NUM_OF_NODES-1:0]; // source node
+wire [DEST_NODE_WIDTH-1:0] source_address_in_input_flit [NUM_OF_NODES-1:0][NUM_OF_PORTS-1:0]; // source node
+wire [DEST_NODE_WIDTH-1:0] destination_address_in_output_flit [NUM_OF_NODES-1:0][NUM_OF_PORTS-1:0]; // dest node
+wire [DEST_NODE_WIDTH-1:0] source_address_in_output_flit [NUM_OF_NODES-1:0][NUM_OF_PORTS-1:0]; // source node
 
 (* keep *) wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
 wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;

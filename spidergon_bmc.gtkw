@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Jun 13 12:28:22 2020
+[*] Sat Jun 13 14:34:05 2020
 [*]
 [dumpfile] "/home/phung/Downloads/noc/spidergon_proof/engine_0/trace.vcd"
-[dumpfile_mtime] "Sat Jun 13 12:28:11 2020"
-[dumpfile_size] 325847
+[dumpfile_mtime] "Sat Jun 13 14:29:18 2020"
+[dumpfile_size] 331281
 [savefile] "/home/phung/Downloads/noc/spidergon_bmc.gtkw"
 [timestart] 0
 [size] 960 995
@@ -3936,6 +3936,14 @@ spidergon_top.source_node_num[31:0]
 spidergon_top.flit_data_input_contains_header[23:0]
 spidergon_top.flit_data_output_contains_header[23:0]
 @28
+spidergon_top.NODES<0>.SPnode.node_needs_to_send_its_own_data[2:0]
+spidergon_top.NODES<1>.SPnode.node_needs_to_send_its_own_data[2:0]
+spidergon_top.NODES<2>.SPnode.node_needs_to_send_its_own_data[2:0]
+spidergon_top.NODES<3>.SPnode.node_needs_to_send_its_own_data[2:0]
+spidergon_top.NODES<4>.SPnode.node_needs_to_send_its_own_data[2:0]
+spidergon_top.NODES<5>.SPnode.node_needs_to_send_its_own_data[2:0]
+spidergon_top.NODES<6>.SPnode.node_needs_to_send_its_own_data[2:0]
+spidergon_top.NODES<7>.SPnode.node_needs_to_send_its_own_data[2:0]
 spidergon_top.source_address_in_input_flit<0>[2:0]
 spidergon_top.source_address_in_input_flit<1>[2:0]
 spidergon_top.source_address_in_input_flit<2>[2:0]
@@ -3944,6 +3952,22 @@ spidergon_top.source_address_in_input_flit<4>[2:0]
 spidergon_top.source_address_in_input_flit<5>[2:0]
 spidergon_top.source_address_in_input_flit<6>[2:0]
 spidergon_top.source_address_in_input_flit<7>[2:0]
+spidergon_top.source_address_in_input_flit<8>[2:0]
+spidergon_top.source_address_in_input_flit<9>[2:0]
+spidergon_top.source_address_in_input_flit<10>[2:0]
+spidergon_top.source_address_in_input_flit<11>[2:0]
+spidergon_top.source_address_in_input_flit<12>[2:0]
+spidergon_top.source_address_in_input_flit<13>[2:0]
+spidergon_top.source_address_in_input_flit<14>[2:0]
+spidergon_top.source_address_in_input_flit<15>[2:0]
+spidergon_top.source_address_in_input_flit<16>[2:0]
+spidergon_top.source_address_in_input_flit<17>[2:0]
+spidergon_top.source_address_in_input_flit<18>[2:0]
+spidergon_top.source_address_in_input_flit<19>[2:0]
+spidergon_top.source_address_in_input_flit<20>[2:0]
+spidergon_top.source_address_in_input_flit<21>[2:0]
+spidergon_top.source_address_in_input_flit<22>[2:0]
+spidergon_top.source_address_in_input_flit<23>[2:0]
 spidergon_top.source_address_in_output_flit<0>[2:0]
 spidergon_top.source_address_in_output_flit<1>[2:0]
 spidergon_top.source_address_in_output_flit<2>[2:0]
@@ -3952,5 +3976,21 @@ spidergon_top.source_address_in_output_flit<4>[2:0]
 spidergon_top.source_address_in_output_flit<5>[2:0]
 spidergon_top.source_address_in_output_flit<6>[2:0]
 spidergon_top.source_address_in_output_flit<7>[2:0]
+spidergon_top.source_address_in_output_flit<8>[2:0]
+spidergon_top.source_address_in_output_flit<9>[2:0]
+spidergon_top.source_address_in_output_flit<10>[2:0]
+spidergon_top.source_address_in_output_flit<11>[2:0]
+spidergon_top.source_address_in_output_flit<12>[2:0]
+spidergon_top.source_address_in_output_flit<13>[2:0]
+spidergon_top.source_address_in_output_flit<14>[2:0]
+spidergon_top.source_address_in_output_flit<15>[2:0]
+spidergon_top.source_address_in_output_flit<16>[2:0]
+spidergon_top.source_address_in_output_flit<17>[2:0]
+spidergon_top.source_address_in_output_flit<18>[2:0]
+spidergon_top.source_address_in_output_flit<19>[2:0]
+spidergon_top.source_address_in_output_flit<20>[2:0]
+spidergon_top.source_address_in_output_flit<21>[2:0]
+spidergon_top.source_address_in_output_flit<22>[2:0]
+spidergon_top.source_address_in_output_flit<23>[2:0]
 [pattern_trace] 1
 [pattern_trace] 0
