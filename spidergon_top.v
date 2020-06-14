@@ -480,20 +480,14 @@ begin
 
 	for (source_node_num = 0; source_node_num < NUM_OF_NODES; source_node_num = source_node_num + 1) 
 	begin
-	
-	  for (other_nodes_num = 0; other_nodes_num < NUM_OF_NODES; other_nodes_num = other_nodes_num + 1) 
-	  begin
-	  
+
 		for(port_nums = 0; port_nums < NUM_OF_PORTS; port_nums = port_nums + 1)
 		begin
-		
 			// to avoid logic loop error during synthesis
 			num_of_in_progress_data_packets[source_node_num] = 
 			current_num_of_in_progress_data_packets[source_node_num];
 		
 			//if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
-		
-			//if(node_sending_data_to_other_nodes[source_node_num][port_nums]) begin
 			
 				/* source node had just sent a data packet */
 
@@ -503,12 +497,20 @@ begin
 				  
 			  			num_of_in_progress_data_packets[source_node_num] =
 			  			num_of_in_progress_data_packets[source_node_num] + 1;
-		  			
+		end
+	end
+	
+	for (other_nodes_num = 0; other_nodes_num < NUM_OF_NODES; other_nodes_num = other_nodes_num + 1) 
+	begin
+	
+		for(port_nums = 0; port_nums < NUM_OF_PORTS; port_nums = port_nums + 1)
+		begin
+			//if(node_sending_data_to_other_nodes[source_node_num][port_nums]) begin
 
 				/* destination node had just received a data packet */
 				
 				if(flit_data_input_contains_header[other_nodes_num*NUM_OF_PORTS + port_nums] &&
-				   (source_address_in_input_flit[source_node_num][port_nums] == source_node_num) && 
+				   (source_address_in_input_flit[other_nodes_num][port_nums] == source_node_num) && 
 				   flit_data_input_are_valid[other_nodes_num][port_nums] &&
 				   (packet_arrived_at_dest[source_node_num]))
 
@@ -516,7 +518,6 @@ begin
 			  			num_of_in_progress_data_packets[source_node_num] - 1;
 			//end
 	  	end
-	  end
 	end
 end
 
