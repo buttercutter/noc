@@ -197,9 +197,10 @@ always @(posedge clk) reset_previously <= reset;
 
 
 // For each node, every ports could send different data in the same clock cycle to different destination nodes
-wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+reg [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+reg [DEST_NODE_WIDTH-1:0] previous_dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 
-wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
 wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 
@@ -402,7 +403,7 @@ generate
 			assign vc_is_to_be_deallocated[port_num][vc_num] = 
 					(req_previous[port_num][vc_num] && 
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
-					(prev_vc == vc_num)) && (requests_in_ports_have_been_served[port_num]);
+					(prev_vc == previous_vc[vc_num])) && (requests_in_ports_have_been_served[port_num]);
 
 
 			// virtual channel reservation logic block
@@ -503,6 +504,62 @@ generate
 
 		
 		`ifdef FORMAL
+			wire [HEAD_TAIL-1:0] random_generated_head = $anyconst;
+			reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] random_generated_vc;
+			reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] previous_random_generated_vc;
+			
+			always @(posedge clk) previous_random_generated_vc <= random_generated_vc;
+		
+			always @(posedge clk)
+				previous_dest_node_for_sending_node_own_data[port_num] <= 
+				dest_node_for_sending_node_own_data[port_num];
+		
+			always @(*)
+			begin
+				case(random_generated_head)
+				
+					HEAD_FLIT 	: 
+					begin
+						random_generated_vc = $anyconst;
+						dest_node_for_sending_node_own_data[port_num] = $anyseq;
+						node_needs_to_send_its_own_data[port_num] = $anyseq;
+					end
+								  
+					BODY_FLIT 	: 
+					begin
+						random_generated_vc = previous_random_generated_vc;
+						dest_node_for_sending_node_own_data[port_num] =
+							previous_dest_node_for_sending_node_own_data[port_num];
+						node_needs_to_send_its_own_data[port_num] =
+							node_needs_to_send_its_own_data_previously[port_num];
+					end
+					
+					TAIL_FLIT 	: 
+					begin
+						random_generated_vc = previous_random_generated_vc;
+						dest_node_for_sending_node_own_data[port_num] =
+							previous_dest_node_for_sending_node_own_data[port_num];
+						node_needs_to_send_its_own_data[port_num] =
+							node_needs_to_send_its_own_data_previously[port_num];
+					end
+								  			
+					HEADER	 	: 
+					begin
+						random_generated_vc = $anyconst;
+						dest_node_for_sending_node_own_data[port_num] = $anyseq;
+						node_needs_to_send_its_own_data[port_num] = $anyseq;
+					end
+					
+					default		:
+					begin
+						random_generated_vc = $anyconst; // don't care
+						dest_node_for_sending_node_own_data[port_num] = $anyseq; // don't care
+						node_needs_to_send_its_own_data[port_num] = 0; // don't send
+					end
+					
+				endcase
+			end
+		
 			always @(posedge clk)
 			begin
 				if(reset) random_generated_data <= 0;
@@ -510,11 +567,10 @@ generate
 				else random_generated_data <= $anyconst;
 			end
 			
-			assign dest_node_for_sending_node_own_data[port_num] = $anyseq; // always less than NUM_OF_NODES
-			assign node_needs_to_send_its_own_data[port_num] = $anyseq;	// depends on dest node of data packets
+			
 			assign node_own_data[port_num] = 
 					{
-						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
+						random_generated_head, random_generated_vc, 
 					 	dest_node_for_sending_node_own_data[port_num], // destination node
 						current_node, // source node
 
