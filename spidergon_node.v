@@ -196,11 +196,17 @@ reg reset_previously;
 always @(posedge clk) reset_previously <= reset;
 
 
+`ifdef FORMAL
 // For each node, every ports could send different data in the same clock cycle to different destination nodes
 reg [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
-reg [DEST_NODE_WIDTH-1:0] previous_dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
-
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+`else
+// For each node, every ports could send different data in the same clock cycle to different destination nodes
+wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+`endif
+
+reg [DEST_NODE_WIDTH-1:0] previous_dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
 wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 
