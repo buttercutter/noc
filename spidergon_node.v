@@ -469,7 +469,7 @@ generate
 						(output_flit_type == TAIL_FLIT);
 
 
-		assign dest_node[port_num] = (reset) ? 
+		assign dest_node[port_num] = (!reset & reset_previously) ? 
 				data_input[(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH] :
 				flit_data_input[port_num][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH];
 
