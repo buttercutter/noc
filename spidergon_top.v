@@ -425,6 +425,7 @@ wire [DEST_NODE_WIDTH-1:0] source_address_in_output_flit [NUM_OF_NODES-1:0][NUM_
 
 (* keep *) wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
 wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
+wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_tail;
 
 wire [NUM_OF_PORTS-1:0] node_sending_data_to_other_nodes [NUM_OF_NODES-1:0];
 
@@ -447,7 +448,10 @@ generate
 			assign flit_data_input_contains_header[node_num*NUM_OF_PORTS + port_num] =
 						((flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
 						(flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
-						
+				
+			assign flit_data_input_contains_tail[node_num*NUM_OF_PORTS + port_num] =
+						(flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT);
+		
 			// head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
 
 			assign destination_address_in_output_flit[node_num][port_num] = 
@@ -489,7 +493,7 @@ begin
 		
 			//if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
 			
-				/* source node had just sent a data packet */
+				/* source node had just sent a data packet header */
 
 				if(flit_data_output_contains_header[source_node_num*NUM_OF_PORTS + port_nums] && 
 				   (source_address_in_output_flit[source_node_num][port_nums] == source_node_num) &&
@@ -507,9 +511,9 @@ begin
 		begin
 			//if(node_sending_data_to_other_nodes[source_node_num][port_nums]) begin
 
-				/* destination node had just received a data packet */
+				/* destination node had just received the entire data packet */
 				
-				if(flit_data_input_contains_header[other_nodes_num*NUM_OF_PORTS + port_nums] &&
+				if(flit_data_input_contains_tail[other_nodes_num*NUM_OF_PORTS + port_nums] &&
 				   (source_address_in_input_flit[other_nodes_num][port_nums] == source_node_num) && 
 				   flit_data_input_are_valid[other_nodes_num][port_nums] &&
 				   (packet_arrived_at_dest[source_node_num]))
