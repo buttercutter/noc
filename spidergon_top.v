@@ -22,14 +22,14 @@ module spidergon_top
 // See http://www.lisnoc.org/packets.html
 
 // 01 = head_flit , 10 = data_flit (body_flit), 00 = tail_flit, 11 = flit_without_data_payload
-localparam HEAD_FLIT = 'b01;
-localparam HEADER = 'b11; // flit_without_data_payload
-localparam BODY_FLIT = 'b10;
-localparam TAIL_FLIT = 'b00;
+localparam HEAD_FLIT = 2'b01;
+localparam HEADER = 2'b11; // flit_without_data_payload
+localparam BODY_FLIT = 2'b10;
+localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
 parameter DEST_NODE_WIDTH = $clog2(NUM_OF_NODES);
-localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+FLIT_DATA_WIDTH;
+localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DATA_WIDTH;
 
 localparam DIRECTION_WIDTH = 2; // $clog2(NUM_OF_PORTS)
 localparam NUM_OF_PORTS = 3; // clockwise, anti-clockwise, across
@@ -80,13 +80,13 @@ initial first_clock_had_passed = 0;
 
 always @(posedge clk) first_clock_had_passed <= 1;
 
-wire [NUM_OF_NODES-1:0] packet_arrived_at_dest;
+reg [NUM_OF_PORTS-1:0] packet_arrived_at_dest [NUM_OF_NODES-1:0];
 
 reg [NUM_OF_NODES-1:0] data_packet_contains_header;
-reg [NUM_OF_NODES-1:0] destination_address_matches;
+reg [NUM_OF_PORTS-1:0] destination_address_matches [NUM_OF_NODES-1:0];
 
 initial data_packet_contains_header = 0;
-initial destination_address_matches = 0;
+//initial destination_address_matches = 0;
 
 
 wire [NUM_OF_PORTS*HEAD_TAIL-1:0] input_flit_type [NUM_OF_NODES-1:0];
@@ -256,16 +256,30 @@ generate
 
 
 		`ifdef FORMAL
-		initial	assume(data_input[((node_num+1)*FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER);
+		//initial	assume(data_input[((node_num+1)*FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER);
 
+	    always@(posedge clk)
+		begin
+	        if(first_clock_had_passed && $past(reset)) 
+	        	assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 
+			               {
+								HEADER, 
+								{$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, // assume the first VC
+		 				 		node_num[DEST_NODE_WIDTH-1:0], 
+					 			{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
+								 DEST_NODE_WIDTH-1){1'b0}}
+							});	 
+
+			else assume(data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH] == 0);
+		end
 
 		// multi-hop verification for deadlock check
 
-		integer dest_ports, source_node_num;
+		integer dest_ports;
 
-		always @(posedge clk)
+		always @(*)
 		begin
-			if(reset) data_packet_contains_header[node_num] <= 0;
+			if(reset) data_packet_contains_header[node_num] = 0;
 
 			else begin
 
@@ -274,32 +288,34 @@ generate
 					if((input_flit_type[node_num][dest_ports*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT) ||
 					   (input_flit_type[node_num][dest_ports*HEAD_TAIL +: HEAD_TAIL] == HEADER))
 
-						data_packet_contains_header[node_num] <= 1;
+						data_packet_contains_header[node_num] = 1;
 				end
 			end
 		end
 
 
-		always @(posedge clk)
-		begin
-			if(reset) destination_address_matches[node_num] <= 0;
-	
-			else begin
+		always @(*)
+		begin							
+			for(dest_ports = 0; dest_ports < NUM_OF_PORTS; dest_ports = dest_ports + 1)
+			begin
+				destination_address_matches[node_num][dest_ports] = 0; // try to reset before checking
+			
+				if((node_num == flit_data_input[node_num][dest_ports][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH])
+					&& flit_data_input_are_valid[node_num][dest_ports])
 
-				for(source_node_num = 1; source_node_num<=NUM_OF_NODES; 
-					source_node_num = source_node_num + 1)
-				begin
-					if(node_num == 
-						data_input[(source_node_num*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH])
-
-						destination_address_matches[node_num] <= 1;	
-				end	
-			end	
+					destination_address_matches[node_num][dest_ports] = 1;
+			end
 		end
 
-
-		assign packet_arrived_at_dest[node_num] = (first_clock_had_passed &&
-				(data_packet_contains_header[node_num]) && (destination_address_matches[node_num]));
+		always @(*) 
+		begin
+			for(dest_ports = 0; dest_ports < NUM_OF_PORTS; dest_ports = dest_ports + 1)
+			begin
+				packet_arrived_at_dest[node_num][dest_ports] = (first_clock_had_passed &&
+								(data_packet_contains_header[node_num]) && 
+								(destination_address_matches[node_num][dest_ports]));
+			end
+		end
 
 		integer port_num;
 
@@ -309,33 +325,31 @@ generate
 			begin
 				for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 				begin
-					if(port_num == out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH])
-						assert(flit_data_output[node_num][port_num] == node_data_from_cpu[node_num]);
+					if((port_num == 
+					   $past(out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH]))
+						&& flit_data_output_are_valid[node_num][port_num])
+
+							assert(flit_data_output[node_num][port_num] ==
+		 							node_data_from_cpu[node_num]);
 					
 					else assert(flit_data_output[node_num][port_num] == 0);
 				end
 			end
 
-			else if(packet_arrived_at_dest[node_num]) begin // reaching destination node
+			else if(|packet_arrived_at_dest[node_num]) begin // reaching destination node
+				// 'case()' is not used here because multiple data packets could arrive in the same clock cycle
 
-				// use 'b1xx since a node can receive packets from 
-				// all three incoming ports in the same clock cyle
+				if(packet_arrived_at_dest[node_num][ACROSS])
+					assert(flit_data_input[node_num][ACROSS][(FLIT_DATA_WIDTH-1) -:
+					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 
-				case (flit_data_input_are_valid[node_num])
+				if(packet_arrived_at_dest[node_num][CLOCKWISE])
+					assert(flit_data_input[node_num][CLOCKWISE][(FLIT_DATA_WIDTH-1) -:
+					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 
-					'bxx1 : assert(flit_data_input[node_num][ACROSS] == 
-									data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH]);
-
-					'bx1x : assert(flit_data_input[node_num][CLOCKWISE] == 
-									data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH]);
-
-					'b1xx : assert(flit_data_input[node_num][ANTI_CLOCKWISE] == 
-									data_input[node_num*FLIT_TOTAL_WIDTH +: FLIT_TOTAL_WIDTH]);
-
-					//default : assert(1);// don't care when it is 'b000 since no data is received yet
-
-				endcase
-
+				if(packet_arrived_at_dest[node_num][ANTI_CLOCKWISE])
+					assert(flit_data_input[node_num][ANTI_CLOCKWISE][(FLIT_DATA_WIDTH-1) -:
+					 		DEST_NODE_WIDTH] == node_num[DEST_NODE_WIDTH-1:0]);
 			end
 
 			// verify the correctness of single-hop routing between two neighbour nodes
@@ -347,11 +361,14 @@ generate
 		end
 
 		// single data packet traversing the NoC and reached its destination successfully
-		always @(posedge clk) cover(packet_arrived_at_dest[node_num]);
+		always @(posedge clk) cover(|packet_arrived_at_dest[node_num]);			
+		always @(posedge clk) cover(|destination_address_matches[node_num]);
 		always @(posedge clk) cover(data_packet_contains_header[node_num]);
-		//always @(posedge clk) cover(destination_address_matches[node_num]);
+		
+		// multiple data packets traversing the NoC and reached their destination successfully
+		always @(posedge clk) cover(&packet_arrived_at_dest[node_num]);
+		
 		`endif
-
 	end
 
 endgenerate
@@ -359,8 +376,154 @@ endgenerate
 
 `ifdef FORMAL
 
-// multiple data packets traversing the NoC and reached their destination successfully
-always @(posedge clk) cover(&packet_arrived_at_dest);
+/* deadlock check */
+localparam MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS = 32;
+reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS):0] 
+			 num_of_in_progress_data_packets [NUM_OF_NODES-1:0];
+
+reg [$clog2(MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS):0] 
+			 current_num_of_in_progress_data_packets [NUM_OF_NODES-1:0];
+
+reg possible_deadlock_scenario [NUM_OF_NODES-1:0];
+
+generate
+	genvar node_num;
+
+	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
+	begin : DEADLOCK
+
+		initial possible_deadlock_scenario[node_num] = 0;
+		initial num_of_in_progress_data_packets[node_num] = 0;
+
+		always @(posedge clk)
+		begin
+			if(reset) current_num_of_in_progress_data_packets[node_num] <= 0;
+		
+			current_num_of_in_progress_data_packets[node_num] <= num_of_in_progress_data_packets[node_num];
+		end
+
+		always @(posedge clk)
+		begin
+			if(reset) possible_deadlock_scenario[node_num] <= 0;
+			
+			else if(num_of_in_progress_data_packets[node_num] >= MAX_NUM_OF_ALLOWABLE_IN_PROGRESS_DATA_PACKETS)
+				possible_deadlock_scenario[node_num] <= 1;
+		end
+
+		always @(posedge clk) 
+		begin
+			assert(possible_deadlock_scenario[node_num] == 0);
+			cover(possible_deadlock_scenario[node_num]); // trying to get waveform in case of deadlock
+		end
+	end
+endgenerate
+
+
+wire [DEST_NODE_WIDTH-1:0] source_address_in_input_flit [NUM_OF_NODES-1:0][NUM_OF_PORTS-1:0]; // source node
+wire [DEST_NODE_WIDTH-1:0] destination_address_in_output_flit [NUM_OF_NODES-1:0][NUM_OF_PORTS-1:0]; // dest node
+wire [DEST_NODE_WIDTH-1:0] source_address_in_output_flit [NUM_OF_NODES-1:0][NUM_OF_PORTS-1:0]; // source node
+
+(* keep *) wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_output_contains_header;
+wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_header;
+wire [NUM_OF_NODES*NUM_OF_PORTS-1:0] flit_data_input_contains_tail;
+
+wire [NUM_OF_PORTS-1:0] node_sending_data_to_other_nodes [NUM_OF_NODES-1:0];
+
+generate
+
+	genvar node_num, port_num;
+
+	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
+	begin : NODES
+	
+		initial node_data_from_cpu[node_num] = 0;
+	
+		for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
+		begin : PORTS
+		
+			assign flit_data_output_contains_header[node_num*NUM_OF_PORTS + port_num] =
+						((flit_data_output[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
+						(flit_data_output[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
+				
+			assign flit_data_input_contains_header[node_num*NUM_OF_PORTS + port_num] =
+						((flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER) || 
+						(flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT));
+				
+			assign flit_data_input_contains_tail[node_num*NUM_OF_PORTS + port_num] =
+						(flit_data_input[node_num][port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT);
+		
+			// head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
+
+			assign destination_address_in_output_flit[node_num][port_num] = 
+						flit_data_output[node_num][port_num][(FLIT_DATA_WIDTH-1) -: $clog2(NUM_OF_NODES)];
+
+			assign source_address_in_output_flit[node_num][port_num] = 
+						flit_data_output[node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -:
+				 											$clog2(NUM_OF_NODES)];
+
+			assign source_address_in_input_flit[node_num][port_num] = 
+						flit_data_input[node_num][port_num][(FLIT_DATA_WIDTH-1-$clog2(NUM_OF_NODES)) -: 
+															$clog2(NUM_OF_NODES)];
+															
+			assign node_sending_data_to_other_nodes[node_num][port_num] =
+						source_address_in_output_flit[source_node_num][port_num] !=
+						destination_address_in_output_flit[source_node_num][port_num];
+		end
+	end
+	
+endgenerate
+
+
+integer source_node_num, other_nodes_num, port_nums;
+
+always @(*)
+begin
+	// sum up the number of data packet that originate from source node, and ends in destination node
+	// this is to track any in-progress data packets that had been sent out by a particular source node
+	// but not received yet by some other nodes other than the source node
+
+	for (source_node_num = 0; source_node_num < NUM_OF_NODES; source_node_num = source_node_num + 1) 
+	begin
+
+		for(port_nums = 0; port_nums < NUM_OF_PORTS; port_nums = port_nums + 1)
+		begin
+			// to avoid logic loop error during synthesis
+			num_of_in_progress_data_packets[source_node_num] = 
+			current_num_of_in_progress_data_packets[source_node_num];
+		
+			//if(reset) num_of_in_progress_data_packets[source_node_num] = 0;
+			
+				/* source node had just sent a data packet header */
+
+				if(flit_data_output_contains_header[source_node_num*NUM_OF_PORTS + port_nums] && 
+				   (source_address_in_output_flit[source_node_num][port_nums] == source_node_num) &&
+				    flit_data_output_are_valid[source_node_num][port_nums])
+				  
+			  			num_of_in_progress_data_packets[source_node_num] =
+			  			num_of_in_progress_data_packets[source_node_num] + 1;
+		end
+	end
+	
+	for (other_nodes_num = 0; other_nodes_num < NUM_OF_NODES; other_nodes_num = other_nodes_num + 1) 
+	begin
+	
+		for(port_nums = 0; port_nums < NUM_OF_PORTS; port_nums = port_nums + 1)
+		begin
+			//if(node_sending_data_to_other_nodes[source_node_num][port_nums]) begin
+
+				/* destination node had just received the entire data packet */
+				
+				if(flit_data_input_contains_tail[other_nodes_num*NUM_OF_PORTS + port_nums] &&
+				   (source_address_in_input_flit[other_nodes_num][port_nums] == source_node_num) && 
+				   flit_data_input_are_valid[other_nodes_num][port_nums] &&
+				   (packet_arrived_at_dest[source_node_num]))
+
+			  			num_of_in_progress_data_packets[source_node_num] =
+			  			num_of_in_progress_data_packets[source_node_num] - 1;
+			//end
+	  	end
+	end
+end
 
 `endif
 

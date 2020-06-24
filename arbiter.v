@@ -65,25 +65,23 @@ end
 reg [WIDTH-1:0] req_previous;
 always @(posedge clk) req_previous <= req;
 
-always @(posedge clk)
+always @(*)
 begin
 	// starts round-robin arbiter with req #0 getting prioritized first
-	if(reset) base <= 1;
+	if(reset) base = 1;
 
 	// 'grant' is a one-hot signal, but 'req' is not a one-hot signal
 	// 'base' is a one-hot signal which rotates
 	//  after the corresponding 'req' had been granted/given permission to proceed)
 	//  Rotation wraps around upon reaching MSB
 
-	else if((grant & req_previous) == grant) // this determines whether the same client request had been granted
-
-		base <= (base[WIDTH-1]) ? 1 : (base << 1);
+	else base = (grant[WIDTH-1]) ? 1 : (grant == 0) ? 1 : (grant << 1);
 end
 
 `ifdef FORMAL
 
 initial assume(reset);
-//initial assume(req == 0);  // only enable this assume() to test the cover() at line 101 properly
+//initial assume(req == 0);  // only enable this assume() to test the cover() at line 100 properly
 
 genvar grant_num;
 
@@ -93,7 +91,6 @@ generate
 		always @(*)	cover(first_clock_had_passed && grant[grant_num]);  // covers grants to each of the clients' request
 
 endgenerate
-
 
 always @(posedge clk) cover(!$past(reset) && (grant == 0)); // covers the ability to go to an idle state
 
@@ -106,6 +103,7 @@ always @(posedge clk) grant_previous <= grant;
 
 always @(posedge clk) cover(grant != grant_previous); // covers the ability to switch grants to any other requests
 
+always @(posedge clk) cover(first_clock_had_passed && $past(first_clock_had_passed) && (&req) && (req_previous == 4'b1100) && ($past(req_previous) == 4'b1011)); // covers round-robin ability
 `endif
 
 `ifdef FORMAL
@@ -129,27 +127,24 @@ begin
 	end
 end
 
-always @(posedge clk)
+always @(*)
 begin
-	if(first_clock_had_passed)
-	begin
-		// starts round-robin arbiter with req #0 getting prioritized first
-		if($past(reset)) assert(base == 1);
+	// starts round-robin arbiter with req #0 getting prioritized first
+	if(reset) assert(base == 1);
 
-		// 'grant' is a one-hot signal, but 'req' is not a one-hot signal
-		// 'base' is a one-hot signal which rotates
-		//  after the corresponding 'req' had been granted/given permission to proceed)
-		//  Rotation wraps around upon reaching MSB
+	// 'grant' is a one-hot signal, but 'req' is not a one-hot signal
+	// 'base' is a one-hot signal which rotates
+	//  after the corresponding 'req' had been granted/given permission to proceed)
+	//  Rotation wraps around upon reaching MSB
 
-		else if(($past(grant) & $past(req_previous)) == $past(grant)) // this determines whether the same client request had been granted
-		begin
-			assert(base == ($past(base[WIDTH-1])) ? 1 : ($past(base) << 1));
-			assert(base != 0);
-		end
-
-		else assert(base != 0);
+	else begin
+		assert(base == (grant[WIDTH-1]) ? 1 : (grant == 0) ? 1 : (grant << 1));
+		assert(base != 0);
 	end
 end
+
+// assertions for round-robin capability
+
 
 `endif
 

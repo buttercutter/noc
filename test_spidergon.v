@@ -58,7 +58,7 @@ reg clk, reset;
 
     @(posedge clk);
 
-    #100 $finish;
+    #300 $finish;
 
   end
 

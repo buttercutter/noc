@@ -45,13 +45,13 @@ localparam ANTI_CLOCKWISE = 0;
 // See http://www.lisnoc.org/packets.html
 
 // 01 = head_flit , 10 = data_flit (body_flit), 00 = tail_flit, 11 = flit_without_data_payload
-localparam HEAD_FLIT = 'b01;
-localparam HEADER = 'b11; // flit_without_data_payload
-localparam BODY_FLIT = 'b10;
-localparam TAIL_FLIT = 'b00;
+localparam HEAD_FLIT = 2'b01;
+localparam HEADER = 2'b11; // flit_without_data_payload
+localparam BODY_FLIT = 2'b10;
+localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
-localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+FLIT_DATA_WIDTH;
+localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DATA_WIDTH;
 
 
 localparam NUM_OF_PORTS = 3; // clockwise, anti-clockwise, across
@@ -146,17 +146,19 @@ wire [NUM_OF_PORTS-1:0] req_port;
 // note that 'grant' is one-hot vector, 
 // when asserted, it means the corresponding 'req' is approved/granted
 // and only a single priority line is serviced (granted) at any given clock cycle
-wire [NUM_OF_VIRTUAL_CHANNELS-1:0] granted_vc;
+wire [NUM_OF_VIRTUAL_CHANNELS-1:0] granted_vc [NUM_OF_PORTS-1:0];
 wire [NUM_OF_PORTS-1:0] granted_port;
 
 // binary encoding of 'granted_vc' and 'granted_port'. Refer to module 'oh_to_idx'
-wire [$clog2(NUM_OF_VIRTUAL_CHANNELS)-1:0] granted_vc_index;
+wire [$clog2(NUM_OF_VIRTUAL_CHANNELS)-1:0] granted_vc_index [NUM_OF_PORTS-1:0];
 wire [$clog2(NUM_OF_PORTS)-1:0] granted_port_index;
 
 
 // for detecting if all outstanding requests are already served
 wire [NUM_OF_PORTS-1:0] requests_in_ports_have_been_served = req_port & granted_port;
 wire [NUM_OF_PORTS-1:0] outstanding_requests_in_multiple_ports = req_port - granted_port;
+//wire [NUM_OF_VIRTUAL_CHANNELS-1:0] outstanding_requests_in_multiple_vcs =
+//							 		req[granted_port_index] - granted_vc[granted_port_index];
 
 // https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
 wire requests_from_multiple_ports = !((req_port != 0) && ((req_port & (req_port - 1)) == 0));
@@ -167,15 +169,9 @@ arbiter #(NUM_OF_PORTS) rr_arb_port_to_cpu
 (.clk(clk), .reset(reset), .req(outstanding_requests_in_multiple_ports), .grant(granted_port));
 
 
-// remember that each ports have multiple vc
-// virtual channel (VC) outgoing buffers round-robin arbitration (maps vc in port to cpu)
-arbiter #(NUM_OF_VIRTUAL_CHANNELS) rr_arb_vc_to_cpu
-(.clk(clk), .reset(reset), .req(req[granted_port_index]), .grant(granted_vc));
-
-
 // for one-hot encoding to binary encoding conversion
 oh_to_idx #(NUM_OF_PORTS) port_index (.one_hot(granted_port), .index(granted_port_index));
-oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) vc_index (.one_hot(granted_vc), .index(granted_vc_index));
+
 
 
 reg [NUM_OF_PORTS-1:0] past_req_port;
@@ -186,9 +182,9 @@ begin
 	if(reset & reset_previously)
 		node_data_to_cpu = data_input;
 
-	else if(past_req_port == 0) node_data_to_cpu = 0;
+	else if(reset || (past_req_port == 0)) node_data_to_cpu = 0;
 
-	else node_data_to_cpu = data_output_from_vc[granted_port_index][granted_vc_index];
+	else node_data_to_cpu = data_output_from_vc[granted_port_index][granted_vc_index[granted_port_index]];
 end
 
 
@@ -200,6 +196,21 @@ reg reset_previously;
 always @(posedge clk) reset_previously <= reset;
 
 
+`ifdef FORMAL
+// For each node, every ports could send different data in the same clock cycle to different destination nodes
+reg [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+`else
+// For each node, every ports could send different data in the same clock cycle to different destination nodes
+wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+`endif
+
+reg [DEST_NODE_WIDTH-1:0] previous_dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
+wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
+
+
 // note that flits from the same data packet cannot be interleaved 
 // among different virtual channels
 // Why ? Because of head flit and tail flit indication
@@ -208,10 +219,10 @@ always @(posedge clk) reset_previously <= reset;
 // let HEAD_TAIL = 2  to indicate flit type
 // let FLIT_TOTAL_WIDTH = HEAD_TAIL + FLIT_DATA_WIDTH
 
-// 18-bit head flit format as follows: {01, prev_vc, destination_node, 12 bits of data_payload}
-// prev_vc consumes 1 bit, destination_node consumes 3 bits (8 nodes in total), 
-// so we are left with 12 bits in the head flit
-// these 12 bits could be data payload as well
+// 18-bit head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
+// prev_vc consumes 1 bit, destination_node or source node consume 3 bits (8 nodes in total), 
+// so we are left with 9 bits in the head flit
+// these 9 bits could be data payload as well
 
 // 18-bit body flit format as follows: {10, prev_vc, 15 bits of data_payload}
 // 18-bit tail flit format as follows: {00, prev_vc, 15 bits of data_payload}
@@ -254,6 +265,24 @@ generate
 
 	for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 	begin : PORTS	
+
+
+		// remember that each ports have multiple vc
+		// virtual channel (VC) outgoing buffers round-robin arbitration (maps vc in port to cpu)
+		arbiter #(NUM_OF_VIRTUAL_CHANNELS) rr_arb_vc_to_cpu
+		(.clk(clk), .reset(reset), 
+		 .req(req[port_num]), 
+		 .grant(granted_vc[port_num]));
+
+
+		// for one-hot encoding to binary encoding conversion
+
+		oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) vc_index 
+		(
+			.one_hot(granted_vc[port_num]), 
+			.index(granted_vc_index[port_num])
+		);
+
 
 		`ifdef FORMAL
 			assign out_port_num[port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH] = direction[port_num];
@@ -302,15 +331,19 @@ generate
 			// (the next node has at least one available, non-reserved vc) OR 
 			// (any of the reserved vc (at next node) has sufficient buffer space)	
 			// AND (to prevent competition of virtual channels for CPU)
-			wire dequeue_en = (((|adjacent_nodes_are_ready[dest_node[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
-								NUM_OF_VIRTUAL_CHANNELS]) || (|adjacent_nodes_vc_are_reserved_and_not_full))
-								&& (!requests_from_multiple_ports ||
-									requests_from_multiple_ports && requests_in_ports_have_been_served[port_num]));
+			wire dequeue_en = (direction[port_num] == STOP) ? 1'b0 :
+				  (((|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
+					NUM_OF_VIRTUAL_CHANNELS]) || (|adjacent_nodes_vc_are_reserved_and_not_full))
+					&& (!requests_from_multiple_ports ||
+						requests_from_multiple_ports &&
+					 	requests_in_ports_have_been_served[port_num]));
 
 
 			assign adjacent_nodes_vc_are_reserved_and_not_full[vc_num] = 
-			  ((!adjacent_nodes_are_ready[dest_node[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]) 
-			  & (!adjacent_node_vc_are_full[dest_node[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
+				(direction[port_num] == STOP) ? 1'b0 :					
+
+			  ((!adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]) 
+			  & (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
 
 
 			assign previous_vc[vc_num] = (reset || vc_is_available[port_num][vc_num]) ? 
@@ -320,7 +353,8 @@ generate
 			// enqueues when 'data is valid' && ((available vc is granted permission) || 
 			// ('vc is reserved' by the same 'head flit')) && '!current vc is full'
 
-			wire enqueue_en = (!reset & reset_previously) ? flit_data_input_are_valid[port_num] && (vc_num == 0) :
+			wire enqueue_en = (!reset & reset_previously) ? 
+						flit_data_input_are_valid[port_num] && (vc_num == 0) :
 
 						flit_data_input_are_valid[port_num] &&
 						((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num]) ||
@@ -375,7 +409,7 @@ generate
 			assign vc_is_to_be_deallocated[port_num][vc_num] = 
 					(req_previous[port_num][vc_num] && 
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
-					(prev_vc == vc_num)) && (requests_in_ports_have_been_served[port_num]);
+					(prev_vc == previous_vc[vc_num])) && (requests_in_ports_have_been_served[port_num]);
 
 
 			// virtual channel reservation logic block
@@ -435,9 +469,9 @@ generate
 						(output_flit_type == TAIL_FLIT);
 
 
-		assign dest_node[port_num] = (reset) ? 
-				data_input[(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH] :
-				flit_data_output[port_num][(FLIT_DATA_WIDTH-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -: DEST_NODE_WIDTH];
+		assign dest_node[port_num] = (!reset & reset_previously) ? 
+				data_input[(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH] :
+				flit_data_input[port_num][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH];
 
 		// path routing computation block for each input ports
 		router #(NUM_OF_NODES) rt 
@@ -445,7 +479,10 @@ generate
 			//.clk(clk),
 
 			// see the math logic in router.v on why we set it to 'current_node' for tail_flit
-			.dest_node((stop_flow) ? current_node : dest_node[port_num]), 
+			.dest_node((stop_flow && !node_needs_to_send_its_own_data[port_num]) ? 
+							current_node :
+							(node_needs_to_send_its_own_data[port_num]) ?
+							 dest_node_for_sending_node_own_data[port_num] : dest_node[port_num]), 
 			.current_node(current_node), 
 			.direction(direction[port_num])
 		);
@@ -454,8 +491,122 @@ generate
 		always @(posedge clk) valid_output_previously[port_num] <= valid_output[port_num];
 
 		// for aligning correctly with 'flit_data_output' in the same clock cycle
-		assign flit_data_output_are_valid[port_num] = valid_output[port_num];	
-	
+		assign flit_data_output_are_valid[port_num] = valid_output_previously[port_num];	
+
+		localparam NUM_OF_CLOCK_CYCLES_BEFORE_SENDING_NODE_OWN_DATA = 8;
+		reg [$clog2(NUM_OF_CLOCK_CYCLES_BEFORE_SENDING_NODE_OWN_DATA)-1:0] start_sending_node_own_data;
+		
+		always @(posedge clk) 
+		begin
+			if(reset) start_sending_node_own_data <= 0;
+			
+			else if(~&start_sending_node_own_data)
+				start_sending_node_own_data <= start_sending_node_own_data + 1;
+		end
+
+		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-1:0]
+ 				random_generated_data;
+
+
+		
+		`ifdef FORMAL
+			wire [HEAD_TAIL-1:0] random_generated_head = $anyconst;
+			reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] random_generated_vc;
+			reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] previous_random_generated_vc;
+			
+			always @(posedge clk) previous_random_generated_vc <= random_generated_vc;
+		
+			always @(posedge clk)
+				previous_dest_node_for_sending_node_own_data[port_num] <= 
+				dest_node_for_sending_node_own_data[port_num];
+		
+			always @(*)
+			begin
+				case(random_generated_head)
+				
+					HEAD_FLIT 	: 
+					begin
+						random_generated_vc = $anyconst;
+						dest_node_for_sending_node_own_data[port_num] = $anyseq;
+						node_needs_to_send_its_own_data[port_num] = $anyseq;
+					end
+								  
+					BODY_FLIT 	: 
+					begin
+						random_generated_vc = previous_random_generated_vc;
+						dest_node_for_sending_node_own_data[port_num] =
+							previous_dest_node_for_sending_node_own_data[port_num];
+						node_needs_to_send_its_own_data[port_num] =
+							node_needs_to_send_its_own_data_previously[port_num];
+					end
+					
+					TAIL_FLIT 	: 
+					begin
+						random_generated_vc = previous_random_generated_vc;
+						dest_node_for_sending_node_own_data[port_num] =
+							previous_dest_node_for_sending_node_own_data[port_num];
+						node_needs_to_send_its_own_data[port_num] =
+							node_needs_to_send_its_own_data_previously[port_num];
+					end
+								  			
+					HEADER	 	: 
+					begin
+						random_generated_vc = $anyconst;
+						dest_node_for_sending_node_own_data[port_num] = $anyseq;
+						node_needs_to_send_its_own_data[port_num] = $anyseq;
+					end
+					
+					default		:
+					begin
+						random_generated_vc = $anyconst; // don't care
+						dest_node_for_sending_node_own_data[port_num] = $anyseq; // don't care
+						node_needs_to_send_its_own_data[port_num] = 0; // don't send
+					end
+					
+				endcase
+			end
+		
+			always @(posedge clk)
+			begin
+				if(reset) random_generated_data <= 0;
+				 
+				else random_generated_data <= $anyconst;
+			end
+			
+			
+			assign node_own_data[port_num] = 
+					{
+						random_generated_head, random_generated_vc, 
+					 	dest_node_for_sending_node_own_data[port_num], // destination node
+						current_node, // source node
+
+						random_generated_data
+					};		
+		`else
+			always @(posedge clk)
+			begin
+				if(reset) random_generated_data <= 0;
+				 
+				else random_generated_data <= random_generated_data + 1; // just for randomness
+			end
+				
+			assign dest_node_for_sending_node_own_data[port_num] = 0; // keeps sending to node #0
+			assign node_needs_to_send_its_own_data[port_num] = (&start_sending_node_own_data); // keeps sending out own data
+			assign node_own_data[port_num] = 
+					{
+						HEADER, {$clog2(NUM_OF_VIRTUAL_CHANNELS){1'b0}}, 
+					 	dest_node_for_sending_node_own_data[port_num], // destination node
+						current_node, // source node
+						
+						random_generated_data+
+						{{(FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-
+ 						DEST_NODE_WIDTH-DEST_NODE_WIDTH-NUM_OF_PORTS){1'b0}},
+			 	  		port_num[NUM_OF_PORTS-1:0]} // adding port_num is for data randomness
+					}; 	
+		`endif		
+
+		always @(posedge clk) 
+			node_needs_to_send_its_own_data_previously[port_num] <= node_needs_to_send_its_own_data[port_num];
 
 		// needs some backpressure logic here
 		assign valid_output[port_num] = (reset) ? 
@@ -463,29 +614,32 @@ generate
 					(direction[port_num] == port_num) && 
 					((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
 
-					(direction[port_num] == port_num) && 
+					((direction[port_num] == port_num) && 
 					(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
 					(valid_output_previously[port_num] && 
-					 (output_flit_type == BODY_FLIT)));
+					 (output_flit_type == BODY_FLIT)) || node_needs_to_send_its_own_data_previously[port_num]));
 
 
-		always @(*)
+		always @(posedge clk)
 		begin
 			//flit_data_output[port_num] <= 0; // clears data in all channels first
 
 			if(reset) 
 			begin
 				if(valid_output[port_num])
-					flit_data_output[port_num] = data_input; // initial data input for NoC
+					flit_data_output[port_num] <= data_input; // initial data input for NoC
 
-				else flit_data_output[port_num] = 0; // clears data in all channels
+				else flit_data_output[port_num] <= 0; // clears data in all channels
 			end
 			
 			else if(valid_output[port_num]) begin
 				// needs some backpressure logic here
 				// sends out data from cpu to physical channel
-				flit_data_output[port_num] = node_data_from_cpu;
+				flit_data_output[port_num] <= (node_needs_to_send_its_own_data[port_num]) ?
+												node_own_data[port_num] : node_data_from_cpu;
 			end
+
+			else flit_data_output[port_num] <=0;
 		end
 
 	end
