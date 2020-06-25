@@ -4,7 +4,7 @@ export PLATFORM    = nangate45
 
 export VERILOG_FILES = $(filter-out ./designs/src/$(DESIGN_NICKNAME)/test_spidergon.v, \
 			$(wildcard ./designs/src/$(DESIGN_NICKNAME)/*.v))
-export SDC_FILE      = ~/Downloads/noc/spidergon.sdc
+export SDC_FILE      = ./designs/src/$(DESIGN_NICKNAME)/spidergon.sdc
 
 # These values must be multiples of placement site
 # x=0.19 y=1.4
