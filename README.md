@@ -15,6 +15,8 @@ USAGE :
            
            make DESIGN_CONFIG=./designs/src/noc/spidergon.mk
            
+           klayout -e ./results/nangate45/noc/6_1_merged.gds results/nangate45/noc/6_final.gds
+           
 
 TODO :
 1. Formal Verification of NoC
