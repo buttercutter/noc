@@ -510,15 +510,41 @@ generate
 
 		
 		`ifdef FORMAL
-			wire [HEAD_TAIL-1:0] random_generated_head = $anyconst;
+			reg [HEAD_TAIL-1:0] random_generated_head;
+			reg [HEAD_TAIL-1:0] previous_random_generated_head;
 			reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] random_generated_vc;
 			reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] previous_random_generated_vc;
 			
+			always @(posedge clk) previous_random_generated_head <= random_generated_head;
 			always @(posedge clk) previous_random_generated_vc <= random_generated_vc;
 		
 			always @(posedge clk)
 				previous_dest_node_for_sending_node_own_data[port_num] <= 
 				dest_node_for_sending_node_own_data[port_num];
+
+			initial previous_random_generated_head = 0; // tail flit
+
+			// a flit must only start with either HEADER or HEAD_FLIT
+			wire header_or_head_flit = $anyseq;
+
+			always @(*)
+			begin
+				case(previous_random_generated_head)
+				
+					HEAD_FLIT	: random_generated_head = BODY_FLIT;
+				
+					// for testing, only 1 body flit
+					BODY_FLIT	: random_generated_head = TAIL_FLIT; 
+					
+					TAIL_FLIT	: random_generated_head = (header_or_head_flit) ?
+															HEADER : HEAD_FLIT;
+					
+					HEADER		: random_generated_head = (header_or_head_flit) ?
+															HEADER : HEAD_FLIT;
+					
+					default		: random_generated_head = TAIL_FLIT; // don't care
+				endcase
+			end
 		
 			always @(*)
 			begin
@@ -526,7 +552,7 @@ generate
 				
 					HEAD_FLIT 	: 
 					begin
-						random_generated_vc = $anyconst;
+						random_generated_vc = $anyseq;
 						dest_node_for_sending_node_own_data[port_num] = $anyseq;
 						node_needs_to_send_its_own_data[port_num] = $anyseq;
 					end
@@ -551,14 +577,14 @@ generate
 								  			
 					HEADER	 	: 
 					begin
-						random_generated_vc = $anyconst;
+						random_generated_vc = $anyseq;
 						dest_node_for_sending_node_own_data[port_num] = $anyseq;
 						node_needs_to_send_its_own_data[port_num] = $anyseq;
 					end
 					
 					default		:
 					begin
-						random_generated_vc = $anyconst; // don't care
+						random_generated_vc = $anyseq; // don't care
 						dest_node_for_sending_node_own_data[port_num] = $anyseq; // don't care
 						node_needs_to_send_its_own_data[port_num] = 0; // don't send
 					end
@@ -570,7 +596,7 @@ generate
 			begin
 				if(reset) random_generated_data <= 0;
 				 
-				else random_generated_data <= $anyconst;
+				else random_generated_data <= $anyseq;
 			end
 			
 			

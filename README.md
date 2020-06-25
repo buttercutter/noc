@@ -2,8 +2,19 @@
 A simple [spidergon network-on-chip](http://sci-hub.tw/https://ieeexplore.ieee.org/abstract/document/1411133) with [wormhole switching](https://en.wikipedia.org/wiki/Wormhole_switching) feature
 
 USAGE :
-1. Synthesis : yosys spidergon.ys
-2. Place and Route : nextpnr-ice40 --lp8k --pcf pins.pcf --json spidergon.json --package cm81 --gui
+1. Synthesis : `yosys spidergon.ys`
+2. Place and Route : 
+
+    FPGA : `nextpnr-ice40 --lp8k --pcf pins.pcf --json spidergon.json --package cm81 --gui`
+    
+    ASIC : `git clone https://github.com/The-OpenROAD-Project/OpenROAD-flow`
+    
+           cd OpenROAD-flow && ./build_openroad.sh -o --or-branch openroad
+           
+           cd ./flow && mv PATH_TO_NOC_REPO ./flow/designs/src/
+           
+           make DESIGN_CONFIG=./designs/src/noc/spidergon.mk
+           
 
 TODO :
 1. Formal Verification of NoC
