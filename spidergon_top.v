@@ -399,7 +399,18 @@ generate
 		begin
 			if(reset) current_num_of_in_progress_data_packets[node_num] <= 0;
 		
-			current_num_of_in_progress_data_packets[node_num] <= num_of_in_progress_data_packets[node_num];
+			else current_num_of_in_progress_data_packets[node_num] <= num_of_in_progress_data_packets[node_num];
+		end
+
+		always @(posedge clk)
+		begin
+			if(first_clock_had_passed)
+			begin
+				if($past(reset)) assert(current_num_of_in_progress_data_packets[node_num] == 0);
+			
+				else assert(current_num_of_in_progress_data_packets[node_num] ==
+				 			$past(num_of_in_progress_data_packets[node_num]));
+			end
 		end
 
 		always @(posedge clk)
