@@ -2,7 +2,7 @@ module test_spidergon
 #( 
 	`ifdef FORMAL	
         parameter NUM_OF_NODES=8, 
-        parameter FLIT_DATA_WIDTH=8,
+        parameter FLIT_DATA_WIDTH=12,
         parameter NODE_BUFFER_WIDTH=16,
     `else
         parameter NUM_OF_NODES=8,

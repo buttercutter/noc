@@ -4,7 +4,7 @@ module spidergon_node
 #(
 	`ifdef FORMAL	
 		parameter NUM_OF_NODES=8, 
-		parameter FLIT_DATA_WIDTH=8,
+		parameter FLIT_DATA_WIDTH=12,
 		parameter NODE_BUFFER_WIDTH=16,
 	`else
 		parameter NUM_OF_NODES=8,
@@ -56,6 +56,8 @@ localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DAT
 
 localparam NUM_OF_PORTS = 3; // clockwise, anti-clockwise, across
 localparam BIDIRECTIONAL_PER_PORT = 2; // two-way data traffic
+
+localparam CRC_BITWIDTH = 3; // CRC-3 output bitwidth
 
 
 input clk, reset;
@@ -454,6 +456,14 @@ generate
 
 			//always @(posedge clk)  cover((vc_num == vc_new) || (vc_num == vc_old));
 
+			always @(posedge clk) // for checking functionality correctness of vc allocation mechanism
+			begin
+				cover(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == BODY_FLIT);
+				cover(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT);
+				cover(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT);
+				cover(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEADER);
+			end
+
 			`endif
 
 		end
@@ -504,12 +514,12 @@ generate
 				start_sending_node_own_data <= start_sending_node_own_data + 1;
 		end
 
-		reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-1:0]
- 				random_generated_data;
 
-
-		
 		`ifdef FORMAL
+
+			reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-
+				 CRC_BITWIDTH-1:0] random_generated_data;
+			
 			reg [HEAD_TAIL-1:0] random_generated_head;
 			reg [HEAD_TAIL-1:0] previous_random_generated_head;
 			reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] random_generated_vc;
@@ -598,6 +608,49 @@ generate
 				 
 				else random_generated_data <= $anyseq;
 			end
+
+
+			// CRC-3 computation occurs whenever a new data packet is to be sent out from source node
+		
+			localparam CRC_INPUT_BITWIDTH = FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS);
+		
+			integer crc_array_bit_location;
+		
+			wire [CRC_BITWIDTH:0] crc_3_divisor = 'b1011;
+		
+			wire [CRC_INPUT_BITWIDTH-1:0] crc_calculation_input
+				= flit_data_input[port_num][0 +: CRC_INPUT_BITWIDTH];
+		
+			reg [CRC_INPUT_BITWIDTH-1:0] crc_intermediate_result;
+			wire [CRC_BITWIDTH-1:0] crc_final_result = crc_intermediate_result[0 +: CRC_BITWIDTH];
+				
+
+			// CRC-3 https://en.wikipedia.org/wiki/Cyclic_redundancy_check#Computation
+			always @(*)
+			begin
+				if(flit_data_output_are_valid[port_num])
+				begin
+					// this is only for formal verification of the NoC, 
+					// so it does not matter if the CRC-3 code is not hardware-friendly
+					// and CRC-3 will not be computed during actual hardware running
+					// at least in current hardware design
+					
+					crc_intermediate_result = crc_calculation_input;
+					
+					for(crc_array_bit_location = (CRC_INPUT_BITWIDTH-1); 
+					    crc_array_bit_location >= CRC_BITWIDTH;
+						crc_array_bit_location = crc_array_bit_location - 1)
+					begin
+						if(crc_intermediate_result[crc_array_bit_location])
+						begin
+							crc_intermediate_result = 
+							crc_intermediate_result ^ 
+							{{(CRC_INPUT_BITWIDTH-crc_array_bit_location-1){1'b0}}, crc_3_divisor, 
+     					 	 {(crc_array_bit_location-CRC_BITWIDTH){1'b0}}};
+						end
+					end
+				end
+			end
 			
 			
 			assign node_own_data[port_num] = 
@@ -606,9 +659,14 @@ generate
 					 	dest_node_for_sending_node_own_data[port_num], // destination node
 						current_node, // source node
 
-						random_generated_data
+						random_generated_data,
+						crc_final_result // CRC-3 results
 					};		
 		`else
+		
+			reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-1:0]
+			 	 random_generated_data;
+			 
 			always @(posedge clk)
 			begin
 				if(reset) random_generated_data <= 0;
