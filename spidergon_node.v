@@ -497,7 +497,7 @@ generate
 			.direction(direction[port_num])
 		);
 
-
+		initial valid_output_previously[port_num] = 0;
 		always @(posedge clk) valid_output_previously[port_num] <= valid_output[port_num];
 
 		// for aligning correctly with 'flit_data_output' in the same clock cycle
@@ -703,6 +703,8 @@ generate
 					(valid_output_previously[port_num] && 
 					 (output_flit_type == BODY_FLIT)) || node_needs_to_send_its_own_data_previously[port_num]));
 
+
+		initial flit_data_output[port_num] = 0;
 
 		always @(posedge clk)
 		begin

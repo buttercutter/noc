@@ -268,7 +268,7 @@ generate
 				wire [CRC_BITWIDTH-1:0] crc_final_result = crc_intermediate_result[0 +: CRC_BITWIDTH];
 			
 				always @(posedge clk) 
-					if(flit_data_input_are_valid[node_num][port_num])
+					if(first_clock_had_passed && flit_data_input_are_valid[node_num][port_num])
 						assert(crc_final_result == 0); // no CRC data integrity error
 				
 			
