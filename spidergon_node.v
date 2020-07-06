@@ -546,11 +546,14 @@ generate
 					// for testing, only 1 body flit
 					BODY_FLIT	: random_generated_head = TAIL_FLIT; 
 					
-					TAIL_FLIT	: random_generated_head = (header_or_head_flit) ?
-															HEADER : HEAD_FLIT;
+					// tail flit could either means the end of an ongoing transaction or no transaction
+					TAIL_FLIT	: random_generated_head = node_needs_to_send_its_own_data_previously[port_num] ? 
+														  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
+														  TAIL_FLIT;
 					
-					HEADER		: random_generated_head = (header_or_head_flit) ?
-															HEADER : HEAD_FLIT;
+					HEADER		: random_generated_head = node_needs_to_send_its_own_data_previously[port_num] ? 
+														  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
+														  TAIL_FLIT;
 					
 					default		: random_generated_head = TAIL_FLIT; // don't care
 				endcase
@@ -564,7 +567,7 @@ generate
 					begin
 						random_generated_vc = $anyseq;
 						dest_node_for_sending_node_own_data[port_num] = $anyseq;
-						node_needs_to_send_its_own_data[port_num] = $anyseq;
+						node_needs_to_send_its_own_data[port_num] = 1; // must send if head_flit is produced
 					end
 								  
 					BODY_FLIT 	: 
