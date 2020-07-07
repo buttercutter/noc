@@ -621,8 +621,9 @@ generate
 		
 			wire [CRC_BITWIDTH:0] crc_3_divisor = 'b1011;
 		
-			wire [CRC_INPUT_BITWIDTH-1:0] crc_calculation_input
-				= flit_data_input[port_num][0 +: CRC_INPUT_BITWIDTH];
+			wire [CRC_INPUT_BITWIDTH-1:0] crc_calculation_input = (node_needs_to_send_its_own_data[port_num]) ?
+			  {node_own_data[port_num][CRC_BITWIDTH +: (CRC_INPUT_BITWIDTH-CRC_BITWIDTH)], {CRC_BITWIDTH{1'b0}}} :
+			  {node_data_from_cpu[CRC_BITWIDTH +: (CRC_INPUT_BITWIDTH-CRC_BITWIDTH)], {CRC_BITWIDTH{1'b0}}};
 		
 			reg [CRC_INPUT_BITWIDTH-1:0] crc_intermediate_result;
 			wire [CRC_BITWIDTH-1:0] crc_final_result = crc_intermediate_result[0 +: CRC_BITWIDTH];
