@@ -516,9 +516,10 @@ generate
 
 
 		`ifdef FORMAL
+			parameter ACTUAL_DATA_PAYLOAD_WIDTH = 
+				FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH;
 
-			reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-
-				 CRC_BITWIDTH-1:0] random_generated_data;
+			reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] random_generated_data;
 			
 			reg [HEAD_TAIL-1:0] random_generated_head;
 			reg [HEAD_TAIL-1:0] previous_random_generated_head;
@@ -537,26 +538,70 @@ generate
 			// a flit must only start with either HEADER or HEAD_FLIT
 			wire header_or_head_flit = $anyseq;
 
+			// generates 3 random data, 2'b0 is to avoid arithmetic sum overflow
+			localparam OVERFLOW_PROTECT = 2;
+			
+			wire [ACTUAL_DATA_PAYLOAD_WIDTH-OVERFLOW_PROTECT-1:0] data0 = $anyseq; // for head flit
+			wire [ACTUAL_DATA_PAYLOAD_WIDTH-OVERFLOW_PROTECT-1:0] data1 = $anyseq; // for body flit #1
+			wire [ACTUAL_DATA_PAYLOAD_WIDTH-OVERFLOW_PROTECT-1:0] data2 = $anyseq; // for body flit #2
+			
+			// this is to check for virtual channel logic correctness
+			wire [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] data_sum = data0+data1+data2; // for tail flit
+			
 			always @(*)
 			begin
+				if(reset)
+				begin
+					random_generated_head = TAIL_FLIT;
+					random_generated_data = 0;
+				end
+				
+				else begin
+				
 				case(previous_random_generated_head)
 				
-					HEAD_FLIT	: random_generated_head = BODY_FLIT;
+					HEAD_FLIT	: begin
+									random_generated_head = BODY_FLIT;
+									random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data0};
+								  end
 				
-					// for testing, only 1 body flit
-					BODY_FLIT	: random_generated_head = TAIL_FLIT; 
+					// for testing, sends 2 body flits
+					BODY_FLIT	: begin
+									if(previous_random_generated_head == HEAD_FLIT) 
+									begin
+										random_generated_head = BODY_FLIT;
+										random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data1};
+									end
+										
+									else begin
+										random_generated_head = TAIL_FLIT; 
+										random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data2};
+									end
+								  end
 					
 					// tail flit could either means the end of an ongoing transaction or no transaction
-					TAIL_FLIT	: random_generated_head = node_needs_to_send_its_own_data_previously[port_num] ? 
+					TAIL_FLIT	: begin
+									random_generated_head =
+											node_needs_to_send_its_own_data_previously[port_num] ? 
 														  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
 														  TAIL_FLIT;
+									random_generated_data = data_sum;
+								  end
 					
-					HEADER		: random_generated_head = node_needs_to_send_its_own_data_previously[port_num] ? 
+					HEADER		: begin
+									random_generated_head =
+									 		node_needs_to_send_its_own_data_previously[port_num] ? 
 														  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
 														  TAIL_FLIT;
+									random_generated_data = data0;
+								  end
 					
-					default		: random_generated_head = TAIL_FLIT; // don't care
+					default		: begin
+									random_generated_head = TAIL_FLIT; // don't care
+									random_generated_data = 0; // don't care
+								  end
 				endcase
+				end
 			end
 		
 			always @(*)
@@ -604,14 +649,14 @@ generate
 					
 				endcase
 			end
-		
+/*		
 			always @(posedge clk)
 			begin
 				if(reset) random_generated_data <= 0;
 				 
 				else random_generated_data <= $anyseq;
 			end
-
+*/
 
 			// CRC-3 computation occurs whenever a new data packet is to be sent out from source node
 		
@@ -663,13 +708,14 @@ generate
 					 	dest_node_for_sending_node_own_data[port_num], // destination node
 						current_node, // source node
 
-						random_generated_data,
-						crc_final_result // CRC-3 results
+						random_generated_data
 					};		
 		`else
 		
-			reg [FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH-1:0]
-			 	 random_generated_data;
+			parameter ACTUAL_DATA_PAYLOAD_WIDTH = 
+				FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH;
+
+			reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] random_generated_data;
 			 
 			always @(posedge clk)
 			begin
