@@ -240,7 +240,7 @@ generate
 			.adjacent_node_vc_are_full(adjacent_node_vc_are_full[node_num]) // input
 		);
 
-
+/*
 		// What about packet-retransmission due to data CRC integrity error ?
 		// will implement this later because the consequences of such a rare failure 
 		// are not high enough to justify effort to mitigate it now
@@ -303,7 +303,7 @@ generate
 		endgenerate
 		
 		`endif
-
+*/
 
 		// See the overall spidergon hardware architecture at https://i.imgur.com/6d9E1JT.png
 		// for Spidergon NoC functional verification and testing only, 

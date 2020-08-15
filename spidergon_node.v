@@ -657,7 +657,7 @@ generate
 				else random_generated_data <= $anyseq;
 			end
 */
-
+/*
 			// CRC-3 computation occurs whenever a new data packet is to be sent out from source node
 		
 			localparam CRC_INPUT_BITWIDTH = FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS);
@@ -700,7 +700,7 @@ generate
 					end
 				end
 			end
-			
+*/			
 			
 			assign node_own_data[port_num] = 
 					{
