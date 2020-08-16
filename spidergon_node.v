@@ -114,6 +114,16 @@ assign flit_data_output_clockwise = flit_data_output[CLOCKWISE];
 assign flit_data_output_anticlockwise = flit_data_output[ANTI_CLOCKWISE];
 
 
+`ifdef FORMAL
+reg first_clock_had_passed = 0;
+reg second_clock_had_passed = 0;
+reg third_clock_had_passed = 0;
+
+always @(posedge clk) first_clock_had_passed <= 1;
+always @(posedge clk) second_clock_had_passed <= first_clock_had_passed;
+always @(posedge clk) third_clock_had_passed <= second_clock_had_passed;
+`endif
+
 // these virtual channel buffers are at input port side
 wire [FLIT_TOTAL_WIDTH-1:0] data_output_from_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 wire [FLIT_TOTAL_WIDTH-1:0] data_input_to_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
@@ -413,6 +423,7 @@ generate
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
 					(prev_vc == previous_vc[vc_num])) && (requests_in_ports_have_been_served[port_num]);
 
+			initial req[port_num][vc_num] = 0;
 
 			// virtual channel reservation logic block
 			always @(posedge clk) 
@@ -453,6 +464,50 @@ generate
 			end
 
 			`ifdef FORMAL
+			
+			// virtual channel reservation logic block
+			always @(posedge clk) 
+			begin
+				if(first_clock_had_passed)
+				begin
+					if($past(reset) && $past(reset_previously) && 
+					   second_clock_had_passed && third_clock_had_passed) 
+						assert(req[port_num][vc_num] == $past(vc_is_to_be_allocated[port_num][vc_num]));
+
+					else if (($past(vc_is_to_be_allocated[port_num][vc_num]) && 
+							  !$past(vc_is_to_be_deallocated[port_num][vc_num]))
+							   
+						 || (!$past(vc_is_to_be_allocated[port_num][vc_num]) && 
+						 	  $past(vc_is_to_be_deallocated[port_num][vc_num])))
+					begin
+
+						// HEAD_FLIT or HEADER will reserve the virtual channel
+						// BODY_FLIT will not affect the channel reservation status
+						// TAIL_FLIT will de-reserve the virtual channel reserved by HEAD_FLIT
+						// HEADER will only reserves its virtual channel for single clock cycle
+
+						// check the flit header to determine the flit nature
+						case($past(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL]))
+						
+							// body_flit
+							// to keep 'req' asserted before the arrival of tail_flit
+							BODY_FLIT : assert(req[port_num][vc_num] == 1);
+
+							// tail_flit
+							TAIL_FLIT : assert(req[port_num][vc_num] == 0);
+
+							// head_flit
+							HEAD_FLIT : assert(req[port_num][vc_num] == 1);
+
+							// header flit_without_data_payload
+							HEADER : assert(req[port_num][vc_num] == 1);
+
+							default : assert(req[port_num][vc_num] == 0);
+
+						endcase
+					end
+				end
+			end
 
 			//always @(posedge clk)  cover((vc_num == vc_new) || (vc_num == vc_old));
 
