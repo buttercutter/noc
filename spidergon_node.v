@@ -52,7 +52,7 @@ localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
 localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DATA_WIDTH;
-
+localparam ACTUAL_DATA_PAYLOAD_WIDTH = FLIT_DATA_WIDTH-DEST_NODE_WIDTH-DEST_NODE_WIDTH;
 
 localparam NUM_OF_PORTS = 3; // clockwise, anti-clockwise, across
 localparam BIDIRECTIONAL_PER_PORT = 2; // two-way data traffic
@@ -571,8 +571,6 @@ generate
 
 
 		`ifdef FORMAL
-			parameter ACTUAL_DATA_PAYLOAD_WIDTH = 
-				FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH;
 
 			reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] random_generated_data;
 			
@@ -766,9 +764,6 @@ generate
 						random_generated_data
 					};		
 		`else
-		
-			parameter ACTUAL_DATA_PAYLOAD_WIDTH = 
-				FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-DEST_NODE_WIDTH-DEST_NODE_WIDTH;
 
 			reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] random_generated_data;
 			 
