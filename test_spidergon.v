@@ -3,7 +3,7 @@ module test_spidergon
 	`ifdef FORMAL	
         parameter NUM_OF_NODES=8, 
         parameter FLIT_DATA_WIDTH=16,
-        parameter NODE_BUFFER_WIDTH=16, // a single vc buffer can hold 1 flit at one time
+        parameter NODE_BUFFER_WIDTH=32, // a single vc buffer can hold 1 flit at one time
     `else
         parameter NUM_OF_NODES=8,
         parameter FLIT_DATA_WIDTH=16,
