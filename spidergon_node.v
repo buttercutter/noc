@@ -212,6 +212,7 @@ always @(posedge clk) reset_previously <= reset;
 // For each node, every ports could send different data in the same clock cycle to different destination nodes
 reg [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
+reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] sum_data [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0]; // for verifying vc logic 
 `else
 // For each node, every ports could send different data in the same clock cycle to different destination nodes
 wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
@@ -374,6 +375,29 @@ generate
 
 						(!current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]);
 
+			`ifdef FORMAL
+			
+			// check virtual channel allocation and de-allocation logic correctness
+			
+			always @(posedge clk)
+			begin
+				if(reset || 
+				   vc_is_to_be_deallocated[port_num][vc_num]) // tail flit is here, so VC is to be released
+						sum_data[port_num][vc_num] <= 0;
+					
+				else if(enqueue_en && (input_flit_type != HEADER))
+					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
+													flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH];
+			end
+			
+			always @(posedge clk)
+			begin
+					if(vc_is_to_be_deallocated[port_num][vc_num]) // tail flit
+						assert(sum_data[port_num][vc_num] == 
+								flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+			end
+			
+			`endif
 
 			// virtual channel buffer in the form of strict FIFO ordering
 			sync_fifo 
