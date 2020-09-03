@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Fri Aug 28 03:03:49 2020
+[*] Thu Sep  3 12:54:51 2020
 [*]
 [dumpfile] "/home/phung/Downloads/noc/spidergon_proof/engine_0/trace.vcd"
-[dumpfile_mtime] "Fri Aug 28 03:02:18 2020"
-[dumpfile_size] 435441
+[dumpfile_mtime] "Thu Sep  3 12:30:57 2020"
+[dumpfile_size] 566439
 [savefile] "/home/phung/Downloads/noc/spidergon_bmc.gtkw"
 [timestart] 0
 [size] 1920 995
-[pos] -101 -1
-*-5.614592 20 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -1 -1
+*-5.614592 50 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [sst_width] 48
 [signals_width] 902
 [sst_expanded] 0
@@ -120,8 +120,10 @@ spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<0>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<0>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<0>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<0>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<0>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -275,8 +277,10 @@ spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<0>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<0>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<0>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<0>.SPnode.PORTS<1>.data2[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<1>.data2_reg[7:0]
 spidergon_top.NODES<0>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
@@ -430,8 +434,10 @@ spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<0>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<0>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<0>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<0>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<0>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<0>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -592,6 +598,14 @@ spidergon_top.NODES<0>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<0>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<0>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<0>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<0>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<0>.SPnode.sum_data<1>[9:0]
+spidergon_top.NODES<0>.SPnode.sum_data<2>[9:0]
+spidergon_top.NODES<0>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<0>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<0>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<0>.SPnode.third_clock_had_passed
 spidergon_top.NODES<0>.SPnode.valid_output[2:0]
 spidergon_top.NODES<0>.SPnode.valid_output_previously[2:0]
@@ -604,9 +618,15 @@ spidergon_top.NODES<0>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<0>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<0>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<0>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<0>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<0>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<0>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<0>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<0>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<0>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<0>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+spidergon_top.NODES<0>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+spidergon_top.NODES<0>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<0>.dest_ports[31:0]
 @28
@@ -711,8 +731,10 @@ spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<1>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<1>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<1>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<1>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<1>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -866,8 +888,10 @@ spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<1>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<1>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<1>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<1>.SPnode.PORTS<1>.data2[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<1>.data2_reg[7:0]
 spidergon_top.NODES<1>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
@@ -1021,8 +1045,10 @@ spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<1>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<1>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<1>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<1>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<1>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<1>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -1183,6 +1209,14 @@ spidergon_top.NODES<1>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<1>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<1>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<1>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<1>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<1>.SPnode.sum_data<1>[9:0]
+spidergon_top.NODES<1>.SPnode.sum_data<2>[9:0]
+spidergon_top.NODES<1>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<1>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<1>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<1>.SPnode.third_clock_had_passed
 spidergon_top.NODES<1>.SPnode.valid_output[2:0]
 spidergon_top.NODES<1>.SPnode.valid_output_previously[2:0]
@@ -1195,9 +1229,15 @@ spidergon_top.NODES<1>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<1>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<1>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<1>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<1>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<1>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<1>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<1>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<1>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<1>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<1>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+spidergon_top.NODES<1>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+spidergon_top.NODES<1>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<1>.dest_ports[31:0]
 @28
@@ -1302,8 +1342,10 @@ spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<2>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<2>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<2>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<2>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<2>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -1457,8 +1499,10 @@ spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<2>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<2>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<2>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<2>.SPnode.PORTS<1>.data2[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<1>.data2_reg[7:0]
 spidergon_top.NODES<2>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
@@ -1612,8 +1656,10 @@ spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<2>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<2>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<2>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<2>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<2>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<2>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -1774,6 +1820,14 @@ spidergon_top.NODES<2>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<2>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<2>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<2>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<2>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<2>.SPnode.sum_data<1>[9:0]
+spidergon_top.NODES<2>.SPnode.sum_data<2>[9:0]
+spidergon_top.NODES<2>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<2>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<2>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<2>.SPnode.third_clock_had_passed
 spidergon_top.NODES<2>.SPnode.valid_output[2:0]
 spidergon_top.NODES<2>.SPnode.valid_output_previously[2:0]
@@ -1786,9 +1840,15 @@ spidergon_top.NODES<2>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<2>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<2>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<2>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<2>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<2>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<2>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<2>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<2>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<2>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<2>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+spidergon_top.NODES<2>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+spidergon_top.NODES<2>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<2>.dest_ports[31:0]
 @28
@@ -1893,8 +1953,10 @@ spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<3>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<3>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<3>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<3>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<3>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -2048,8 +2110,10 @@ spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<3>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<3>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.data2[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<1>.data2_reg[7:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
@@ -2203,8 +2267,10 @@ spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<3>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<3>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<3>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<3>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<3>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<3>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -2365,6 +2431,14 @@ spidergon_top.NODES<3>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<3>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<3>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<3>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<3>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<3>.SPnode.sum_data<1>[9:0]
+spidergon_top.NODES<3>.SPnode.sum_data<2>[9:0]
+spidergon_top.NODES<3>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<3>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<3>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<3>.SPnode.third_clock_had_passed
 spidergon_top.NODES<3>.SPnode.valid_output[2:0]
 spidergon_top.NODES<3>.SPnode.valid_output_previously[2:0]
@@ -2377,9 +2451,15 @@ spidergon_top.NODES<3>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<3>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<3>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<3>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<3>.dest_ports[31:0]
 @28
@@ -2484,8 +2564,10 @@ spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<4>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<4>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<4>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<4>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<4>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -2639,8 +2721,10 @@ spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<4>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<4>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<4>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<4>.SPnode.PORTS<1>.data2[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<1>.data2_reg[7:0]
 spidergon_top.NODES<4>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
@@ -2794,8 +2878,10 @@ spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<4>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<4>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<4>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<4>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<4>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<4>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -2956,6 +3042,14 @@ spidergon_top.NODES<4>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<4>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<4>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<4>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<4>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<4>.SPnode.sum_data<1>[9:0]
+spidergon_top.NODES<4>.SPnode.sum_data<2>[9:0]
+spidergon_top.NODES<4>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<4>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<4>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<4>.SPnode.third_clock_had_passed
 spidergon_top.NODES<4>.SPnode.valid_output[2:0]
 spidergon_top.NODES<4>.SPnode.valid_output_previously[2:0]
@@ -2968,9 +3062,15 @@ spidergon_top.NODES<4>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<4>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<4>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<4>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<4>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<4>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<4>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<4>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<4>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<4>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<4>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+spidergon_top.NODES<4>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+spidergon_top.NODES<4>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<4>.dest_ports[31:0]
 @28
@@ -3075,8 +3175,10 @@ spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<5>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<5>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<5>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<5>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<5>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -3230,8 +3332,10 @@ spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<5>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<5>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<5>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<5>.SPnode.PORTS<1>.data2[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<1>.data2_reg[7:0]
 spidergon_top.NODES<5>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
@@ -3385,8 +3489,10 @@ spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<5>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<5>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<5>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<5>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<5>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<5>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -3547,6 +3653,14 @@ spidergon_top.NODES<5>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<5>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<5>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<5>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<5>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<5>.SPnode.sum_data<1>[9:0]
+spidergon_top.NODES<5>.SPnode.sum_data<2>[9:0]
+spidergon_top.NODES<5>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<5>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<5>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<5>.SPnode.third_clock_had_passed
 spidergon_top.NODES<5>.SPnode.valid_output[2:0]
 spidergon_top.NODES<5>.SPnode.valid_output_previously[2:0]
@@ -3559,9 +3673,15 @@ spidergon_top.NODES<5>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<5>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<5>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<5>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<5>.dest_ports[31:0]
 @28
@@ -3666,8 +3786,10 @@ spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<6>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<6>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<6>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<6>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<6>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -3821,9 +3943,11 @@ spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<6>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<6>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<6>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<6>.SPnode.PORTS<1>.data2[7:0]
-spidergon_top.NODES<6>.SPnode.PORTS<1>.data_sum[4:0]
+spidergon_top.NODES<6>.SPnode.PORTS<1>.data2_reg[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<1>.header_or_head_flit
@@ -3976,8 +4100,10 @@ spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<6>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<6>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<6>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<6>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<6>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<6>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -4065,7 +4191,9 @@ spidergon_top.NODES<6>.SPnode.direction<2>[1:0]
 spidergon_top.NODES<6>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<6>.SPnode.flit_data_input<0>[18:0]
+@23
 spidergon_top.NODES<6>.SPnode.flit_data_input<1>[18:0]
+@22
 spidergon_top.NODES<6>.SPnode.flit_data_input<2>[18:0]
 spidergon_top.NODES<6>.SPnode.flit_data_input_across[18:0]
 spidergon_top.NODES<6>.SPnode.flit_data_input_anticlockwise[18:0]
@@ -4138,6 +4266,16 @@ spidergon_top.NODES<6>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<6>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<6>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<6>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<6>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<6>.SPnode.sum_data<1>[9:0]
+@23
+spidergon_top.NODES<6>.SPnode.sum_data<2>[9:0]
+@22
+spidergon_top.NODES<6>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<6>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<6>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<6>.SPnode.third_clock_had_passed
 spidergon_top.NODES<6>.SPnode.valid_output[2:0]
 spidergon_top.NODES<6>.SPnode.valid_output_previously[2:0]
@@ -4150,9 +4288,17 @@ spidergon_top.NODES<6>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<6>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<6>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<6>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+@29
+spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+@28
+spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<6>.dest_ports[31:0]
 @28
@@ -4257,8 +4403,10 @@ spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<7>.SPnode.PORTS<0>.data0[7:0]
-spidergon_top.NODES<7>.SPnode.PORTS<0>.data1[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<0>.data0_reg[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<0>.data1_reg[7:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.data2[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<0>.data2_reg[7:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.data_sum[9:0]
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<0>.granted_vc_enqueue[1:0]
@@ -4412,8 +4560,10 @@ spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<7>.SPnode.PORTS<1>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<7>.SPnode.PORTS<1>.data0[7:0]
-spidergon_top.NODES<7>.SPnode.PORTS<1>.data1[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<1>.data0_reg[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<1>.data1_reg[7:0]
 spidergon_top.NODES<7>.SPnode.PORTS<1>.data2[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<1>.data2_reg[7:0]
 spidergon_top.NODES<7>.SPnode.PORTS<1>.data_sum[9:0]
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
@@ -4567,8 +4717,10 @@ spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.wr_flip[19:0]
 spidergon_top.NODES<7>.SPnode.PORTS<2>.adjacent_nodes_vc_are_reserved_and_not_full[1:0]
 @22
 spidergon_top.NODES<7>.SPnode.PORTS<2>.data0[7:0]
-spidergon_top.NODES<7>.SPnode.PORTS<2>.data1[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<2>.data0_reg[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<2>.data1_reg[7:0]
 spidergon_top.NODES<7>.SPnode.PORTS<2>.data2[7:0]
+spidergon_top.NODES<7>.SPnode.PORTS<2>.data2_reg[7:0]
 spidergon_top.NODES<7>.SPnode.PORTS<2>.data_sum[9:0]
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<2>.granted_vc_enqueue[1:0]
@@ -4729,6 +4881,14 @@ spidergon_top.NODES<7>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<7>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<7>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<7>.SPnode.second_clock_had_passed
+@22
+spidergon_top.NODES<7>.SPnode.sum_data<0>[9:0]
+spidergon_top.NODES<7>.SPnode.sum_data<1>[9:0]
+spidergon_top.NODES<7>.SPnode.sum_data<2>[9:0]
+spidergon_top.NODES<7>.SPnode.sum_data<3>[9:0]
+spidergon_top.NODES<7>.SPnode.sum_data<4>[9:0]
+spidergon_top.NODES<7>.SPnode.sum_data<5>[9:0]
+@28
 spidergon_top.NODES<7>.SPnode.third_clock_had_passed
 spidergon_top.NODES<7>.SPnode.valid_output[2:0]
 spidergon_top.NODES<7>.SPnode.valid_output_previously[2:0]
@@ -4741,9 +4901,15 @@ spidergon_top.NODES<7>.SPnode.vc_is_available<2>[1:0]
 spidergon_top.NODES<7>.SPnode.vc_is_to_be_allocated<0>[1:0]
 spidergon_top.NODES<7>.SPnode.vc_is_to_be_allocated<1>[1:0]
 spidergon_top.NODES<7>.SPnode.vc_is_to_be_allocated<2>[1:0]
+spidergon_top.NODES<7>.SPnode.vc_is_to_be_allocated_previously<0>[1:0]
+spidergon_top.NODES<7>.SPnode.vc_is_to_be_allocated_previously<1>[1:0]
+spidergon_top.NODES<7>.SPnode.vc_is_to_be_allocated_previously<2>[1:0]
 spidergon_top.NODES<7>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<7>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<7>.SPnode.vc_is_to_be_deallocated<2>[1:0]
+spidergon_top.NODES<7>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+spidergon_top.NODES<7>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+spidergon_top.NODES<7>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<7>.dest_ports[31:0]
 spidergon_top.adjacent_node_vc_are_full<0>[5:0]

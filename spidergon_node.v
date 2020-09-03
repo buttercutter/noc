@@ -143,6 +143,10 @@ reg [NUM_OF_VIRTUAL_CHANNELS-1:0] req_previous [NUM_OF_PORTS-1:0];
 wire [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_allocated [NUM_OF_PORTS-1:0];
 wire [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated [NUM_OF_PORTS-1:0];
 
+`ifdef FORMAL
+reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_allocated_previously [NUM_OF_PORTS-1:0];
+reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated_previously [NUM_OF_PORTS-1:0];
+`endif
 
 localparam DIRECTION_WIDTH = 2;
 wire [DIRECTION_WIDTH-1:0] direction [NUM_OF_PORTS-1:0]; // stop, clockwise, anti-clockwise, across
@@ -379,6 +383,14 @@ generate
 			
 			// check virtual channel allocation and de-allocation logic correctness
 			
+			always @(posedge clk) 
+				vc_is_to_be_allocated_previously[port_num][vc_num] <=
+				vc_is_to_be_allocated[port_num][vc_num];
+
+			always @(posedge clk) 
+				vc_is_to_be_deallocated_previously[port_num][vc_num] <=
+				vc_is_to_be_deallocated[port_num][vc_num];
+			
 			always @(posedge clk)
 			begin
 				if(reset || 
@@ -392,9 +404,14 @@ generate
 			
 			always @(posedge clk)
 			begin
-					if(vc_is_to_be_deallocated[port_num][vc_num]) // tail flit
-						assert(sum_data[port_num][vc_num] == 
-								flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+				if(first_clock_had_passed)
+				begin
+					if($past(reset)) assert(sum_data[port_num][vc_num] == 0);
+				
+					else if(vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit previously
+						assert(sum_data[port_num][vc_num] == // sum_data is only updated after 1 clock cycle
+								$past(flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]));
+				end
 			end
 			
 			`endif
@@ -443,7 +460,7 @@ generate
 
 			// vc is already reserved, waiting to be released by tail_flit
 			assign vc_is_to_be_deallocated[port_num][vc_num] = 
-					(req_previous[port_num][vc_num] && 
+					(req_previous[port_num][vc_num] && flit_data_input_are_valid[port_num] &&
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
 					(prev_vc == previous_vc[vc_num])) && (requests_in_ports_have_been_served[port_num]);
 
@@ -494,10 +511,10 @@ generate
 			begin
 				if(first_clock_had_passed)
 				begin
-					/*if($past(reset) && $past(reset_previously) && second_clock_had_passed) 
-						assert(req[port_num][vc_num] == $past(vc_is_to_be_allocated[port_num][vc_num]));
+					if($past(reset) && $past(reset_previously) && second_clock_had_passed) 
+						assert(req[port_num][vc_num] == vc_is_to_be_allocated_previously[port_num][vc_num]);
 
-					else*/ if (($past(vc_is_to_be_allocated[port_num][vc_num]) && 
+					else if (($past(vc_is_to_be_allocated[port_num][vc_num]) && 
 							  !$past(vc_is_to_be_deallocated[port_num][vc_num]))
 							   
 						 || (!$past(vc_is_to_be_allocated[port_num][vc_num]) && 
