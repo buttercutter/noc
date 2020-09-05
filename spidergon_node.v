@@ -399,8 +399,8 @@ generate
 			always @(posedge clk)
 			begin
 				if(reset || 
-				   vc_is_to_be_deallocated[port_num][vc_num]) // tail flit is here, so VC is to be released
-						sum_data[port_num][vc_num] <= 0;
+				   vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit was here previously
+						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
 				else if(enqueue_en && (input_flit_type != HEADER))
 					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
@@ -411,7 +411,8 @@ generate
 			begin
 				if(first_clock_had_passed)
 				begin
-					if($past(reset)) assert(sum_data[port_num][vc_num] == 0);
+					if($past(reset) || $past(vc_is_to_be_deallocated_previously[port_num][vc_num]))
+						assert(sum_data[port_num][vc_num] == 0);
 				
 					else if(vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit previously
 						assert(sum_data[port_num][vc_num] == // sum_data is only updated after 1 clock cycle
@@ -643,6 +644,10 @@ generate
 			wire [ACTUAL_DATA_PAYLOAD_WIDTH-OVERFLOW_PROTECT-1:0] data1 = $anyseq; // for body flit #1
 			wire [ACTUAL_DATA_PAYLOAD_WIDTH-OVERFLOW_PROTECT-1:0] data2 = $anyseq; // for body flit #2
 			
+			always @(*) assume(data0 != 0); // for easier waveform debugging
+			always @(*) assume(data1 != 0); // for easier waveform debugging
+			always @(*) assume(data2 != 0); // for easier waveform debugging
+			
 			// to store values before $anyseq could change values across clock cycles
 			reg [ACTUAL_DATA_PAYLOAD_WIDTH-OVERFLOW_PROTECT-1:0] data0_reg; // for head flit
 			reg [ACTUAL_DATA_PAYLOAD_WIDTH-OVERFLOW_PROTECT-1:0] data1_reg; // for body flit #1
@@ -662,7 +667,7 @@ generate
 				
 				else begin
 					
-					case(previous_random_generated_head)
+					case(random_generated_head)
 					
 						HEAD_FLIT	: begin
 										data0_reg <= data0; // stores the desired value for later use
@@ -709,103 +714,103 @@ generate
 				end
 			end
 			
-			always @(*)
+			always @(posedge clk)
 			begin
 				if(reset)
 				begin
-					random_generated_head = TAIL_FLIT;
-					random_generated_data = 0;
+					random_generated_head <= TAIL_FLIT;
+					random_generated_data <= 0;
 				end
 				
 				else begin
 				
-					case(previous_random_generated_head)
+					case(random_generated_head)
 					
 						HEAD_FLIT	: begin
-										random_generated_head = BODY_FLIT;
-										random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data0};
+										random_generated_head <= BODY_FLIT;
+										random_generated_data <= {{OVERFLOW_PROTECT{1'b0}}, data0};
 									  end
 					
 						// for testing, sends 2 body flits
 						BODY_FLIT	: begin
 										if(previous_random_generated_head == HEAD_FLIT) 
 										begin
-											random_generated_head = BODY_FLIT;
-											random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data1};
+											random_generated_head <= BODY_FLIT;
+											random_generated_data <= {{OVERFLOW_PROTECT{1'b0}}, data1};
 										end
 											
 										else begin
-											random_generated_head = TAIL_FLIT; 
-											random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data2};
+											random_generated_head <= TAIL_FLIT; 
+											random_generated_data <= {{OVERFLOW_PROTECT{1'b0}}, data2};
 										end
 									  end
 						
 						// tail flit could either means the end of an ongoing transaction or no transaction
 						TAIL_FLIT	: begin
-										random_generated_head =
+										random_generated_head <=
 												node_needs_to_send_its_own_data_previously[port_num] ? 
 															  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
 															  TAIL_FLIT;
-										random_generated_data = data_sum;
+										random_generated_data <= data_sum;
 									  end
 						
 						HEADER		: begin
-										random_generated_head =
+										random_generated_head <=
 										 		node_needs_to_send_its_own_data_previously[port_num] ? 
 															  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
 															  TAIL_FLIT;
-										random_generated_data = data0;
+										random_generated_data <= data0;
 									  end
 						
 						default		: begin
-										random_generated_head = TAIL_FLIT; // don't care
-										random_generated_data = 0; // don't care
+										random_generated_head <= TAIL_FLIT; // don't care
+										random_generated_data <= 0; // don't care
 									  end
 					endcase
 				end
 			end
 		
-			always @(*)
+			always @(posedge clk)
 			begin
 				case(random_generated_head)
 				
 					HEAD_FLIT 	: 
 					begin
-						random_generated_vc = $anyseq;
-						dest_node_for_sending_node_own_data[port_num] = $anyseq;
-						node_needs_to_send_its_own_data[port_num] = 1; // must send if head_flit is produced
+						random_generated_vc <= $anyseq;
+						dest_node_for_sending_node_own_data[port_num] <= $anyseq;
+						node_needs_to_send_its_own_data[port_num] <= 1; // must send if head_flit is produced
 					end
 								  
 					BODY_FLIT 	: 
 					begin
-						random_generated_vc = previous_random_generated_vc;
-						dest_node_for_sending_node_own_data[port_num] =
+						random_generated_vc <= previous_random_generated_vc;
+						dest_node_for_sending_node_own_data[port_num] <=
 							previous_dest_node_for_sending_node_own_data[port_num];
-						node_needs_to_send_its_own_data[port_num] =
+						node_needs_to_send_its_own_data[port_num] <=
 							node_needs_to_send_its_own_data_previously[port_num];
 					end
 					
 					TAIL_FLIT 	: 
 					begin
-						random_generated_vc = previous_random_generated_vc;
-						dest_node_for_sending_node_own_data[port_num] =
+						random_generated_vc <= previous_random_generated_vc;
+						dest_node_for_sending_node_own_data[port_num] <=
 							previous_dest_node_for_sending_node_own_data[port_num];
-						node_needs_to_send_its_own_data[port_num] =
+						node_needs_to_send_its_own_data[port_num] <=
 							node_needs_to_send_its_own_data_previously[port_num];
 					end
 								  			
 					HEADER	 	: 
 					begin
-						random_generated_vc = $anyseq;
-						dest_node_for_sending_node_own_data[port_num] = $anyseq;
-						node_needs_to_send_its_own_data[port_num] = $anyseq;
+						random_generated_vc <= $anyseq;
+						dest_node_for_sending_node_own_data[port_num] <= $anyseq;
+						node_needs_to_send_its_own_data[port_num] <= $anyseq;
 					end
 					
 					default		:
 					begin
-						random_generated_vc = $anyseq; // don't care
-						dest_node_for_sending_node_own_data[port_num] = $anyseq; // don't care
-						node_needs_to_send_its_own_data[port_num] = 0; // don't send
+						random_generated_vc <= $anyseq; // don't care
+						dest_node_for_sending_node_own_data[port_num] <= $anyseq; // don't care
+						node_needs_to_send_its_own_data[port_num] <= 0; // don't send
 					end
 					
 				endcase

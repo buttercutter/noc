@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Sep  5 03:55:23 2020
+[*] Sat Sep  5 14:10:44 2020
 [*]
 [dumpfile] "/home/phung/Downloads/noc/spidergon_proof/engine_0/trace.vcd"
-[dumpfile_mtime] "Sat Sep  5 03:49:21 2020"
-[dumpfile_size] 570822
+[dumpfile_mtime] "Sat Sep  5 14:05:43 2020"
+[dumpfile_size] 632087
 [savefile] "/home/phung/Downloads/noc/spidergon_bmc.gtkw"
 [timestart] 0
 [size] 1920 995
 [pos] -1 -1
-*-5.614592 50 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.614592 60 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [sst_width] 48
 [signals_width] 902
 [sst_expanded] 0
@@ -2129,13 +2129,16 @@ spidergon_top.NODES<3>.SPnode.PORTS<1>.granted_vc_enqueue[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.header_or_head_flit
 spidergon_top.NODES<3>.SPnode.PORTS<1>.output_flit_type[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.prev_vc
+@29
 spidergon_top.NODES<3>.SPnode.PORTS<1>.previous_random_generated_head[1:0]
+@28
 spidergon_top.NODES<3>.SPnode.PORTS<1>.previous_random_generated_vc
 spidergon_top.NODES<3>.SPnode.PORTS<1>.previous_vc[1:0]
 @22
 spidergon_top.NODES<3>.SPnode.PORTS<1>.random_generated_data[9:0]
-@28
+@29
 spidergon_top.NODES<3>.SPnode.PORTS<1>.random_generated_head[1:0]
+@28
 spidergon_top.NODES<3>.SPnode.PORTS<1>.random_generated_vc
 spidergon_top.NODES<3>.SPnode.PORTS<1>.rr_arb_data_to_vc.base[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.rr_arb_data_to_vc.clk
@@ -2376,7 +2379,9 @@ spidergon_top.NODES<3>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<3>.SPnode.flit_data_input_clockwise[18:0]
 spidergon_top.NODES<3>.SPnode.flit_data_input_previously<0>[9:0]
+@23
 spidergon_top.NODES<3>.SPnode.flit_data_input_previously<1>[9:0]
+@22
 spidergon_top.NODES<3>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<3>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<3>.SPnode.flit_data_output<1>[18:0]
@@ -2447,7 +2452,9 @@ spidergon_top.NODES<3>.SPnode.second_clock_had_passed
 spidergon_top.NODES<3>.SPnode.sum_data<0>[9:0]
 spidergon_top.NODES<3>.SPnode.sum_data<1>[9:0]
 spidergon_top.NODES<3>.SPnode.sum_data<2>[9:0]
+@23
 spidergon_top.NODES<3>.SPnode.sum_data<3>[9:0]
+@22
 spidergon_top.NODES<3>.SPnode.sum_data<4>[9:0]
 spidergon_top.NODES<3>.SPnode.sum_data<5>[9:0]
 @28
@@ -2470,7 +2477,9 @@ spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated<2>[1:0]
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+@29
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+@28
 spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<3>.dest_ports[31:0]
@@ -3604,9 +3613,7 @@ spidergon_top.NODES<5>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<5>.SPnode.flit_data_input_clockwise[18:0]
 spidergon_top.NODES<5>.SPnode.flit_data_input_previously<0>[9:0]
-@23
 spidergon_top.NODES<5>.SPnode.flit_data_input_previously<1>[9:0]
-@22
 spidergon_top.NODES<5>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<5>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<5>.SPnode.flit_data_output<1>[18:0]
@@ -3676,10 +3683,8 @@ spidergon_top.NODES<5>.SPnode.second_clock_had_passed
 @22
 spidergon_top.NODES<5>.SPnode.sum_data<0>[9:0]
 spidergon_top.NODES<5>.SPnode.sum_data<1>[9:0]
-@23
 spidergon_top.NODES<5>.SPnode.sum_data<2>[9:0]
 spidergon_top.NODES<5>.SPnode.sum_data<3>[9:0]
-@22
 spidergon_top.NODES<5>.SPnode.sum_data<4>[9:0]
 spidergon_top.NODES<5>.SPnode.sum_data<5>[9:0]
 @28
@@ -3702,9 +3707,7 @@ spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<2>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
-@29
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
-@28
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<5>.dest_ports[31:0]
@@ -4416,6 +4419,7 @@ spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.this_data_locati
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.user_rd_addr[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.user_wr_addr[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr
+@29
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_addr[1:0]
 @22
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.wr_addr_flip[19:0]
