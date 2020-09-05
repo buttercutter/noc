@@ -92,6 +92,7 @@ output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full;
 `ifdef FORMAL
 	output [NUM_OF_PORTS*HEAD_TAIL-1:0] input_flit_type;
 	output [NUM_OF_PORTS*DIRECTION_WIDTH-1:0] out_port_num;
+	reg [FLIT_TOTAL_WIDTH-1:0] flit_data_input_previously [NUM_OF_PORTS-1:0];
 `else
 	wire [NUM_OF_PORTS*HEAD_TAIL-1:0] input_flit_type;
 	//wire [NUM_OF_PORTS*DIRECTION_WIDTH-1:0] out_port_num;
@@ -332,6 +333,10 @@ generate
 		);
 
 
+		always @(posedge clk) 
+			flit_data_input_previously[port_num] <= flit_data_input[port_num];
+
+
 		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] previous_vc;
 
 		for(vc_num=0; vc_num<NUM_OF_VIRTUAL_CHANNELS; vc_num=vc_num+1)
@@ -410,7 +415,7 @@ generate
 				
 					else if(vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit previously
 						assert(sum_data[port_num][vc_num] == // sum_data is only updated after 1 clock cycle
-								$past(flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]));
+								flit_data_input_previously[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
 				end
 			end
 			

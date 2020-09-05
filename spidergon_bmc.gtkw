@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Sep  3 12:54:51 2020
+[*] Sat Sep  5 03:55:23 2020
 [*]
 [dumpfile] "/home/phung/Downloads/noc/spidergon_proof/engine_0/trace.vcd"
-[dumpfile_mtime] "Thu Sep  3 12:30:57 2020"
-[dumpfile_size] 566439
+[dumpfile_mtime] "Sat Sep  5 03:49:21 2020"
+[dumpfile_size] 570822
 [savefile] "/home/phung/Downloads/noc/spidergon_bmc.gtkw"
 [timestart] 0
 [size] 1920 995
@@ -533,6 +533,9 @@ spidergon_top.NODES<0>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<0>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<0>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<0>.SPnode.flit_data_input_previously<0>[9:0]
+spidergon_top.NODES<0>.SPnode.flit_data_input_previously<1>[9:0]
+spidergon_top.NODES<0>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<0>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<0>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<0>.SPnode.flit_data_output<2>[18:0]
@@ -1144,6 +1147,9 @@ spidergon_top.NODES<1>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<1>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<1>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<1>.SPnode.flit_data_input_previously<0>[9:0]
+spidergon_top.NODES<1>.SPnode.flit_data_input_previously<1>[9:0]
+spidergon_top.NODES<1>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<1>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<1>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<1>.SPnode.flit_data_output<2>[18:0]
@@ -1755,6 +1761,9 @@ spidergon_top.NODES<2>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<2>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<2>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<2>.SPnode.flit_data_input_previously<0>[9:0]
+spidergon_top.NODES<2>.SPnode.flit_data_input_previously<1>[9:0]
+spidergon_top.NODES<2>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<2>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<2>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<2>.SPnode.flit_data_output<2>[18:0]
@@ -2366,6 +2375,9 @@ spidergon_top.NODES<3>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<3>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<3>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<3>.SPnode.flit_data_input_previously<0>[9:0]
+spidergon_top.NODES<3>.SPnode.flit_data_input_previously<1>[9:0]
+spidergon_top.NODES<3>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<3>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<3>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<3>.SPnode.flit_data_output<2>[18:0]
@@ -2977,6 +2989,9 @@ spidergon_top.NODES<4>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<4>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<4>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<4>.SPnode.flit_data_input_previously<0>[9:0]
+spidergon_top.NODES<4>.SPnode.flit_data_input_previously<1>[9:0]
+spidergon_top.NODES<4>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<4>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<4>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<4>.SPnode.flit_data_output<2>[18:0]
@@ -3588,6 +3603,11 @@ spidergon_top.NODES<5>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<5>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<5>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<5>.SPnode.flit_data_input_previously<0>[9:0]
+@23
+spidergon_top.NODES<5>.SPnode.flit_data_input_previously<1>[9:0]
+@22
+spidergon_top.NODES<5>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<5>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<5>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<5>.SPnode.flit_data_output<2>[18:0]
@@ -3656,8 +3676,10 @@ spidergon_top.NODES<5>.SPnode.second_clock_had_passed
 @22
 spidergon_top.NODES<5>.SPnode.sum_data<0>[9:0]
 spidergon_top.NODES<5>.SPnode.sum_data<1>[9:0]
+@23
 spidergon_top.NODES<5>.SPnode.sum_data<2>[9:0]
 spidergon_top.NODES<5>.SPnode.sum_data<3>[9:0]
+@22
 spidergon_top.NODES<5>.SPnode.sum_data<4>[9:0]
 spidergon_top.NODES<5>.SPnode.sum_data<5>[9:0]
 @28
@@ -3680,7 +3702,9 @@ spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated<2>[1:0]
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
+@29
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
+@28
 spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<5>.dest_ports[31:0]
@@ -4191,9 +4215,7 @@ spidergon_top.NODES<6>.SPnode.direction<2>[1:0]
 spidergon_top.NODES<6>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<6>.SPnode.flit_data_input<0>[18:0]
-@23
 spidergon_top.NODES<6>.SPnode.flit_data_input<1>[18:0]
-@22
 spidergon_top.NODES<6>.SPnode.flit_data_input<2>[18:0]
 spidergon_top.NODES<6>.SPnode.flit_data_input_across[18:0]
 spidergon_top.NODES<6>.SPnode.flit_data_input_anticlockwise[18:0]
@@ -4201,6 +4223,9 @@ spidergon_top.NODES<6>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<6>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<6>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<6>.SPnode.flit_data_input_previously<0>[9:0]
+spidergon_top.NODES<6>.SPnode.flit_data_input_previously<1>[9:0]
+spidergon_top.NODES<6>.SPnode.flit_data_input_previously<2>[9:0]
 spidergon_top.NODES<6>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<6>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<6>.SPnode.flit_data_output<2>[18:0]
@@ -4269,9 +4294,7 @@ spidergon_top.NODES<6>.SPnode.second_clock_had_passed
 @22
 spidergon_top.NODES<6>.SPnode.sum_data<0>[9:0]
 spidergon_top.NODES<6>.SPnode.sum_data<1>[9:0]
-@23
 spidergon_top.NODES<6>.SPnode.sum_data<2>[9:0]
-@22
 spidergon_top.NODES<6>.SPnode.sum_data<3>[9:0]
 spidergon_top.NODES<6>.SPnode.sum_data<4>[9:0]
 spidergon_top.NODES<6>.SPnode.sum_data<5>[9:0]
@@ -4295,9 +4318,7 @@ spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated<0>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated<1>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated<2>[1:0]
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated_previously<0>[1:0]
-@29
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated_previously<1>[1:0]
-@28
 spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 @22
 spidergon_top.NODES<6>.dest_ports[31:0]
@@ -4816,6 +4837,9 @@ spidergon_top.NODES<7>.SPnode.flit_data_input_anticlockwise[18:0]
 spidergon_top.NODES<7>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<7>.SPnode.flit_data_input_clockwise[18:0]
+spidergon_top.NODES<7>.SPnode.flit_data_input_previously<0>[9:0]
+spidergon_top.NODES<7>.SPnode.flit_data_input_previously<1>[9:0]
+spidergon_top.NODES<7>.SPnode.flit_data_input_previously<2>[18:0]
 spidergon_top.NODES<7>.SPnode.flit_data_output<0>[18:0]
 spidergon_top.NODES<7>.SPnode.flit_data_output<1>[18:0]
 spidergon_top.NODES<7>.SPnode.flit_data_output<2>[18:0]
@@ -5159,7 +5183,15 @@ spidergon_top.source_address_in_output_flit<7>[2:0]
 spidergon_top.source_address_in_output_flit<8>[2:0]
 spidergon_top.source_address_in_output_flit<9>[2:0]
 spidergon_top.source_address_in_output_flit<10>[2:0]
+@c00028
 spidergon_top.source_address_in_output_flit<11>[2:0]
+@28
+(0)spidergon_top.source_address_in_output_flit<11>[2:0]
+(1)spidergon_top.source_address_in_output_flit<11>[2:0]
+(2)spidergon_top.source_address_in_output_flit<11>[2:0]
+@1401200
+-group_end
+@28
 spidergon_top.source_address_in_output_flit<12>[2:0]
 spidergon_top.source_address_in_output_flit<13>[2:0]
 spidergon_top.source_address_in_output_flit<14>[2:0]
