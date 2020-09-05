@@ -402,7 +402,7 @@ generate
 				   vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit was here previously
 						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
-				else if(enqueue_en && (input_flit_type != HEADER))
+				else if(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER))
 					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
 													flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH];
 			end
