@@ -105,6 +105,18 @@ generate
 	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
 	begin : NODES
 
+		`ifdef FORMAL
+		
+		// don't send an initial data packet which is already addressed to itself, 
+		// which makes data packet transfer operation meaningless
+		always @(posedge clk)
+		begin
+			if(first_clock_had_passed && reset & $past(reset))
+				assume(data_input[((node_num+1)*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -:
+			 					DEST_NODE_WIDTH] != node_num[DEST_NODE_WIDTH-1:0]); 
+		end
+		`endif
+
 		if(node_num == 0)
 		begin
 			assign flit_data_input[node_num][ANTI_CLOCKWISE] = flit_data_output[NUM_OF_NODES-1][CLOCKWISE];
