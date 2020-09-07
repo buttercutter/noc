@@ -719,7 +719,8 @@ generate
 				if(reset)
 				begin
 					random_generated_head <= TAIL_FLIT;
-					random_generated_data <= 0;
+					random_generated_data <= // could be $anyseq because don't care
+							{ACTUAL_DATA_PAYLOAD_WIDTH{1'b1}}; //this is just for easier debug
 				end
 				
 				else begin
@@ -751,7 +752,11 @@ generate
 												node_needs_to_send_its_own_data_previously[port_num] ? 
 															  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
 															  TAIL_FLIT;
-										random_generated_data <= data_sum;
+										if($past(random_generated_head) == BODY_FLIT) // ongoing transaction
+											random_generated_data <= data_sum;
+											
+										else random_generated_data <=  // could be $anyseq because don't care
+												{ACTUAL_DATA_PAYLOAD_WIDTH{1'b1}}; //this is just for easier debug
 									  end
 						
 						HEADER		: begin
@@ -762,10 +767,10 @@ generate
 										random_generated_data <= data0;
 									  end
 						
-						default		: begin
-										random_generated_head <= TAIL_FLIT; // don't care
-										random_generated_data <= 0; // don't care
-									  end
+						//default		: begin
+						//				random_generated_head <= TAIL_FLIT; // don't care
+						//				random_generated_data <= 0; // don't care
+						//			  end
 					endcase
 				end
 			end
