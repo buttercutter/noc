@@ -332,10 +332,10 @@ generate
 		 	.grant(granted_vc_enqueue)
 		);
 
-
+		`ifdef FORMAL
 		always @(posedge clk) 
 			flit_data_input_previously[port_num] <= flit_data_input[port_num];
-
+		`endif
 
 		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] previous_vc;
 
@@ -468,6 +468,7 @@ generate
 			assign vc_is_to_be_deallocated[port_num][vc_num] = 
 					(req_previous[port_num][vc_num] && flit_data_input_are_valid[port_num] &&
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
+					(enqueue_en) && // still needs to enqueue 1 last flit (tail flit) into vc before deallocation
 					(prev_vc == previous_vc[vc_num])) && (requests_in_ports_have_been_served[port_num]);
 
 			initial req[port_num][vc_num] = 0;
