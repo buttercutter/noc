@@ -147,6 +147,9 @@ wire [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated [NUM_OF_PORTS-1:0];
 `ifdef FORMAL
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_allocated_previously [NUM_OF_PORTS-1:0];
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated_previously [NUM_OF_PORTS-1:0];
+
+reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_allocated_by_head_flit [NUM_OF_PORTS-1:0];
+reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_allocated_by_head_flit_previously [NUM_OF_PORTS-1:0];
 `endif
 
 localparam DIRECTION_WIDTH = 2;
@@ -395,6 +398,25 @@ generate
 			always @(posedge clk) 
 				vc_is_to_be_deallocated_previously[port_num][vc_num] <=
 				vc_is_to_be_deallocated[port_num][vc_num];
+
+			always @(posedge clk) 
+				vc_is_allocated_by_head_flit_previously[port_num][vc_num] <=
+				vc_is_allocated_by_head_flit[port_num][vc_num];			
+				
+			
+			always @(posedge clk)
+			begin
+				if(reset || 
+					// head flit -> 2 body flits -> tail flit
+				  (vc_is_to_be_deallocated[port_num][vc_num] && 
+				   vc_is_allocated_by_head_flit[port_num][vc_num])) 
+				   
+					vc_is_allocated_by_head_flit[port_num][vc_num] <= 0;
+				
+				else if(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))
+					vc_is_allocated_by_head_flit[port_num][vc_num] <= 1;
+			end
+
 			
 			always @(posedge clk)
 			begin
@@ -402,7 +424,8 @@ generate
 				   vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit was here previously
 						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
-				else if(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER))
+				else if(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER) &&
+						vc_is_allocated_by_head_flit[port_num][vc_num])
 					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
 													flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH];
 			end
@@ -414,7 +437,8 @@ generate
 					if($past(reset) || $past(vc_is_to_be_deallocated_previously[port_num][vc_num]))
 						assert(sum_data[port_num][vc_num] == 0);
 				
-					else if(vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit previously
+					else if(vc_is_allocated_by_head_flit_previously[port_num][vc_num] && 
+							vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit previously
 						assert(sum_data[port_num][vc_num] == // sum_data is only updated after 1 clock cycle
 								flit_data_input_previously[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
 				end
