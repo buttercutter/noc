@@ -319,8 +319,8 @@ generate
 						flit_data_input[port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] ;
 
 		// virtual channel index at previous node
-		wire prev_vc = 
-				flit_data_input[port_num][(FLIT_DATA_WIDTH-1) -: VIRTUAL_CHANNELS_BITWIDTH] ;
+		wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] prev_vc = 
+				flit_data_input[port_num][(FLIT_TOTAL_WIDTH-HEAD_TAIL-1) -: VIRTUAL_CHANNELS_BITWIDTH] ;
 
 
 		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_vc_are_reserved_and_not_full;
@@ -381,8 +381,8 @@ generate
 					previous_vc[vc_num] <= prev_vc;
 			end
 
-
-			// enqueues when 'data is valid' && ((available vc is granted permission) || 
+			// enqueues when 'data is valid' && (vc is granted permission from rr arbiter) &&
+			// ((vc is available for head_flit or header flit only) || 
 			// ('vc is reserved' by the same 'head flit')) && '!current vc is full'
 
 			wire enqueue_en = (!reset & reset_previously) ? 
@@ -426,7 +426,9 @@ generate
 					vc_is_allocated_by_head_flit[port_num][vc_num] <= 1;
 			end
 
-			always @(posedge clk) cover(vc_is_allocated_by_head_flit[port_num][vc_num]);
+			always @(posedge clk) 
+				cover(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER) &&
+				 		vc_is_allocated_by_head_flit[port_num][vc_num]);
 			
 			always @(posedge clk)
 			begin
@@ -475,7 +477,12 @@ generate
 				.dequeue_value(data_output_from_vc[port_num][vc_num])
 			);
 	
-			assign data_input_to_vc[port_num][vc_num] = flit_data_input[port_num];			
+			assign data_input_to_vc[port_num][vc_num] = // modify the vc value for wormhole switching purpose
+				{
+					flit_data_input[port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL], // no change
+				 	vc_num[VIRTUAL_CHANNELS_BITWIDTH-1:0], // modified for proper vc allocation and de-allocation
+				 	flit_data_input[port_num][0 +: FLIT_DATA_WIDTH] // no change
+				};
 
 			assign vc_is_available[port_num][vc_num] = !req[port_num][vc_num];
 
