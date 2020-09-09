@@ -9,11 +9,15 @@ USAGE :
     
     ASIC : `git clone https://github.com/The-OpenROAD-Project/OpenROAD-flow`
     
-           cd OpenROAD-flow && ./build_openroad.sh -o --or-branch openroad
+           cd OpenROAD-flow/ && source setup_env.sh
            
-           cd ./flow && mv PATH_TO_NOC_REPO ./flow/designs/src/
+           ./build_openroad.sh -o --or-branch openroad
+           
+           cd ./flow && mv PATH_TO_NOC_REPO ./designs/src/
            
            make DESIGN_CONFIG=./designs/src/noc/spidergon.mk
+           
+           klayout -e ./results/nangate45/noc/6_1_merged.gds results/nangate45/noc/6_final.gds
            
 
 TODO :

@@ -8,7 +8,7 @@ proof: depth 10
 
 cover: mode cover
 cover: depth 7
-cover: append 3
+cover: append 6
 
 [engines]
 smtbmc yices

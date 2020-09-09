@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Jun 20 09:00:18 2020
+[*] Fri Aug 28 16:37:20 2020
 [*]
 [dumpfile] "/home/phung/Downloads/noc/spidergon.vcd"
-[dumpfile_mtime] "Sat Jun 20 08:58:40 2020"
-[dumpfile_size] 165716
+[dumpfile_mtime] "Fri Aug 28 16:34:24 2020"
+[dumpfile_size] 171834
 [savefile] "/home/phung/Downloads/noc/spidergon.gtkw"
 [timestart] 0
-[size] 960 995
-[pos] -51 -1
+[size] 1920 995
+[pos] -1 -1
 *-6.122874 45 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test_spidergon.
 [treeopen] test_spidergon.noc.
 [treeopen] test_spidergon.noc.sp.
 [treeopen] test_spidergon.noc.sp.NODES[0].
 [sst_width] 48
-[signals_width] 414
+[signals_width] 790
 [sst_expanded] 0
 [sst_vpaned_height] 381
 @28
@@ -41,16 +41,20 @@ test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].dequeue_en
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].enqueue_en
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.clk
+@c00028
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.count[1:0]
+@28
+(0)test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.count[1:0]
+(1)test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.count[1:0]
+@1401200
+-group_end
+@28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.dequeue_en
 @22
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.dequeue_value[18:0]
@@ -61,9 +65,6 @@ test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -126,9 +127,6 @@ test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -146,9 +144,6 @@ test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -211,9 +206,6 @@ test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -231,9 +223,6 @@ test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[0].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -292,19 +281,18 @@ test_spidergon.noc.sp.NODES[0].SPnode.current_node[2:0]
 test_spidergon.noc.sp.NODES[0].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[0].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[0].SPnode.data_input[18:0]
-@23
 test_spidergon.noc.sp.NODES[0].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[0].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.flit_data_input_are_valid[2:0]
-@23
-test_spidergon.noc.sp.NODES[0].SPnode.flit_data_input_clockwise[18:0]
 @22
+test_spidergon.noc.sp.NODES[0].SPnode.flit_data_input_clockwise[18:0]
 test_spidergon.noc.sp.NODES[0].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[0].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[0].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[0].SPnode.granted_port[2:0]
@@ -355,9 +343,6 @@ test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -375,9 +360,6 @@ test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -440,9 +422,6 @@ test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -460,9 +439,6 @@ test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -525,9 +501,6 @@ test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -545,9 +518,6 @@ test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[1].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -607,6 +577,7 @@ test_spidergon.noc.sp.NODES[1].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[1].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[1].SPnode.data_input[18:0]
 test_spidergon.noc.sp.NODES[1].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[1].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.flit_data_input_are_valid[2:0]
@@ -616,7 +587,7 @@ test_spidergon.noc.sp.NODES[1].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[1].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[1].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[1].SPnode.granted_port[2:0]
@@ -667,9 +638,6 @@ test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -687,9 +655,6 @@ test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -752,9 +717,6 @@ test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -772,9 +734,6 @@ test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -837,9 +796,6 @@ test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -857,9 +813,6 @@ test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[2].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -919,6 +872,7 @@ test_spidergon.noc.sp.NODES[2].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[2].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[2].SPnode.data_input[18:0]
 test_spidergon.noc.sp.NODES[2].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[2].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.flit_data_input_are_valid[2:0]
@@ -928,7 +882,7 @@ test_spidergon.noc.sp.NODES[2].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[2].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[2].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[2].SPnode.granted_port[2:0]
@@ -979,9 +933,6 @@ test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -999,9 +950,6 @@ test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1064,9 +1012,6 @@ test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1084,9 +1029,6 @@ test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1149,9 +1091,6 @@ test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1169,9 +1108,6 @@ test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[3].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1231,6 +1167,7 @@ test_spidergon.noc.sp.NODES[3].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[3].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[3].SPnode.data_input[18:0]
 test_spidergon.noc.sp.NODES[3].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[3].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.flit_data_input_are_valid[2:0]
@@ -1240,7 +1177,7 @@ test_spidergon.noc.sp.NODES[3].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[3].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[3].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[3].SPnode.granted_port[2:0]
@@ -1291,9 +1228,6 @@ test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1311,9 +1245,6 @@ test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1376,9 +1307,6 @@ test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1396,9 +1324,6 @@ test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1461,9 +1386,6 @@ test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1481,9 +1403,6 @@ test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[4].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1543,6 +1462,7 @@ test_spidergon.noc.sp.NODES[4].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[4].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[4].SPnode.data_input[18:0]
 test_spidergon.noc.sp.NODES[4].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[4].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.flit_data_input_are_valid[2:0]
@@ -1552,7 +1472,7 @@ test_spidergon.noc.sp.NODES[4].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[4].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[4].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[4].SPnode.granted_port[2:0]
@@ -1603,9 +1523,6 @@ test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1623,9 +1540,6 @@ test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1688,9 +1602,6 @@ test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1708,9 +1619,6 @@ test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1773,9 +1681,6 @@ test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1793,9 +1698,6 @@ test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[5].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -1855,6 +1757,7 @@ test_spidergon.noc.sp.NODES[5].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[5].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[5].SPnode.data_input[18:0]
 test_spidergon.noc.sp.NODES[5].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[5].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.flit_data_input_are_valid[2:0]
@@ -1864,7 +1767,7 @@ test_spidergon.noc.sp.NODES[5].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[5].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[5].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[5].SPnode.granted_port[2:0]
@@ -1915,9 +1818,6 @@ test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -1935,9 +1835,6 @@ test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -2000,9 +1897,6 @@ test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -2020,9 +1914,6 @@ test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -2085,9 +1976,6 @@ test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -2105,9 +1993,6 @@ test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[6].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -2167,6 +2052,7 @@ test_spidergon.noc.sp.NODES[6].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[6].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[6].SPnode.data_input[18:0]
 test_spidergon.noc.sp.NODES[6].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[6].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.flit_data_input_are_valid[2:0]
@@ -2176,7 +2062,7 @@ test_spidergon.noc.sp.NODES[6].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[6].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[6].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[6].SPnode.granted_port[2:0]
@@ -2227,9 +2113,6 @@ test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -2247,9 +2130,6 @@ test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[0].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -2312,9 +2192,6 @@ test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -2332,9 +2209,6 @@ test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[1].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -2397,9 +2271,6 @@ test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.full
-@420
-test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.index
-@28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.reset
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[0].fifo.wr_addr[1:0]
@@ -2417,9 +2288,6 @@ test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.enqueue_value[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.full
-@420
-test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.index
-@28
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.rd_addr[1:0]
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.reset
 test_spidergon.noc.sp.NODES[7].SPnode.PORTS[2].VIRTUAL_CHANNELS[1].fifo.wr_addr[1:0]
@@ -2479,6 +2347,7 @@ test_spidergon.noc.sp.NODES[7].SPnode.current_node_is_ready[5:0]
 test_spidergon.noc.sp.NODES[7].SPnode.current_node_vc_are_full[5:0]
 test_spidergon.noc.sp.NODES[7].SPnode.data_input[18:0]
 test_spidergon.noc.sp.NODES[7].SPnode.flit_data_input_across[18:0]
+@23
 test_spidergon.noc.sp.NODES[7].SPnode.flit_data_input_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.flit_data_input_are_valid[2:0]
@@ -2488,7 +2357,7 @@ test_spidergon.noc.sp.NODES[7].SPnode.flit_data_output_across[18:0]
 test_spidergon.noc.sp.NODES[7].SPnode.flit_data_output_anticlockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.flit_data_output_are_valid[2:0]
-@22
+@23
 test_spidergon.noc.sp.NODES[7].SPnode.flit_data_output_clockwise[18:0]
 @28
 test_spidergon.noc.sp.NODES[7].SPnode.granted_port[2:0]

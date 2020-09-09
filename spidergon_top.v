@@ -4,8 +4,8 @@ module spidergon_top
 #(
 	`ifdef FORMAL	
 		parameter NUM_OF_NODES=8, 
-		parameter FLIT_DATA_WIDTH=8,
-		parameter NODE_BUFFER_WIDTH=16,
+		parameter FLIT_DATA_WIDTH=16,
+		parameter NODE_BUFFER_WIDTH=32, // a single vc buffer can hold 2 flit at one time
 	`else
 		parameter NUM_OF_NODES=8,
 		parameter FLIT_DATA_WIDTH=16,
@@ -41,6 +41,8 @@ localparam ANTI_CLOCKWISE = 0;
 
 // for user application mapping, this value must be smaller than NUM_OF_NODES
 localparam NUM_OF_INPUTS = 16;
+
+localparam CRC_BITWIDTH = 3; // CRC-3 output bitwidth
 
 
 input clk, reset;
@@ -102,6 +104,18 @@ generate
 
 	for(node_num = 0; node_num < NUM_OF_NODES; node_num = node_num + 1) 
 	begin : NODES
+
+		`ifdef FORMAL
+		
+		// don't send an initial data packet which is already addressed to itself, 
+		// which makes data packet transfer operation meaningless
+		always @(posedge clk)
+		begin
+			if(first_clock_had_passed && reset & $past(reset))
+				assume(data_input[((node_num+1)*FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS)-1) -:
+			 					DEST_NODE_WIDTH] != node_num[DEST_NODE_WIDTH-1:0]); 
+		end
+		`endif
 
 		if(node_num == 0)
 		begin
@@ -238,11 +252,70 @@ generate
 			.adjacent_node_vc_are_full(adjacent_node_vc_are_full[node_num]) // input
 		);
 
-
+/*
 		// What about packet-retransmission due to data CRC integrity error ?
 		// will implement this later because the consequences of such a rare failure 
 		// are not high enough to justify effort to mitigate it now
 
+		`ifdef FORMAL
+		
+		// CRC-3 computation check occurs whenever a data packet goes from one node to the next node
+		
+		localparam CRC_INPUT_BITWIDTH = FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS);
+		
+		integer crc_array_bit_location;
+		
+		generate
+			genvar port_num;
+
+			for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
+			begin : CRC
+			
+				wire [CRC_BITWIDTH:0] crc_3_divisor = 'b1011;
+			
+				wire [CRC_INPUT_BITWIDTH-1:0] crc_calculation_input
+					= flit_data_input[node_num][port_num][0 +: CRC_INPUT_BITWIDTH];
+			
+				reg [CRC_INPUT_BITWIDTH-1:0] crc_intermediate_result;
+				wire [CRC_BITWIDTH-1:0] crc_final_result = crc_intermediate_result[0 +: CRC_BITWIDTH];
+			
+				always @(*) 
+					if(first_clock_had_passed && flit_data_input_are_valid[node_num][port_num])
+						assert(crc_final_result == 0); // no CRC data integrity error
+				
+			
+				// CRC-3 https://en.wikipedia.org/wiki/Cyclic_redundancy_check#Computation
+				always @(*)
+				begin
+					if(flit_data_input_are_valid[node_num][port_num])
+					begin
+						// this is only for formal verification of the NoC, 
+						// so it does not matter if the CRC-3 code is not hardware-friendly
+						// and CRC-3 will not be computed during actual hardware running
+						// at least in current hardware design
+						
+						crc_intermediate_result = crc_calculation_input;
+						
+						for(crc_array_bit_location = (CRC_INPUT_BITWIDTH-1); 
+						    crc_array_bit_location >= CRC_BITWIDTH;
+							crc_array_bit_location = crc_array_bit_location - 1)
+						begin
+							if(crc_intermediate_result[crc_array_bit_location])
+							begin
+								crc_intermediate_result = 
+								crc_intermediate_result ^ 
+								{{(CRC_INPUT_BITWIDTH-crc_array_bit_location-1){1'b0}}, crc_3_divisor, 
+         					 	 {(crc_array_bit_location-CRC_BITWIDTH){1'b0}}};
+							end
+						end
+					end
+				end
+			end
+			
+		endgenerate
+		
+		`endif
+*/
 
 		// See the overall spidergon hardware architecture at https://i.imgur.com/6d9E1JT.png
 		// for Spidergon NoC functional verification and testing only, 
@@ -317,22 +390,22 @@ generate
 			end
 		end
 
-		integer port_num;
+		integer port_nums;
 
 		always @(posedge clk)
 		begin
 			if(first_clock_had_passed && $past(reset)) 
 			begin
-				for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
+				for(port_nums=0; port_nums<NUM_OF_PORTS; port_nums=port_nums+1)
 				begin
-					if((port_num == 
-					   $past(out_port_num[node_num][port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH]))
-						&& flit_data_output_are_valid[node_num][port_num])
+					if((port_nums == 
+					   $past(out_port_num[node_num][port_nums*DIRECTION_WIDTH +: DIRECTION_WIDTH]))
+						&& flit_data_output_are_valid[node_num][port_nums])
 
-							assert(flit_data_output[node_num][port_num] ==
+							assert(flit_data_output[node_num][port_nums] ==
 		 							node_data_from_cpu[node_num]);
 					
-					else assert(flit_data_output[node_num][port_num] == 0);
+					else assert(flit_data_output[node_num][port_nums] == 0);
 				end
 			end
 
@@ -399,7 +472,18 @@ generate
 		begin
 			if(reset) current_num_of_in_progress_data_packets[node_num] <= 0;
 		
-			current_num_of_in_progress_data_packets[node_num] <= num_of_in_progress_data_packets[node_num];
+			else current_num_of_in_progress_data_packets[node_num] <= num_of_in_progress_data_packets[node_num];
+		end
+
+		always @(posedge clk)
+		begin
+			if(first_clock_had_passed)
+			begin
+				if($past(reset)) assert(current_num_of_in_progress_data_packets[node_num] == 0);
+			
+				else assert(current_num_of_in_progress_data_packets[node_num] ==
+				 			$past(num_of_in_progress_data_packets[node_num]));
+			end
 		end
 
 		always @(posedge clk)
