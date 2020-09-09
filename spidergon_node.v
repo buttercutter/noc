@@ -202,7 +202,9 @@ begin
 	if(reset & reset_previously)
 		node_data_to_cpu = data_input;
 
-	else if(reset || (past_req_port == 0)) node_data_to_cpu = 0;
+	else if(reset || (past_req_port == 0) || 
+			(vc_buffer_is_empty[granted_port_index][granted_vc_index[granted_port_index]])) 
+		node_data_to_cpu = 0;
 
 	else node_data_to_cpu = data_output_from_vc[granted_port_index][granted_vc_index[granted_port_index]];
 end
@@ -340,7 +342,7 @@ generate
 			flit_data_input_previously[port_num] <= flit_data_input[port_num];
 		`endif
 
-		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] previous_vc;
+		reg [NUM_OF_VIRTUAL_CHANNELS-1:0] previous_vc;
 
 		for(vc_num=0; vc_num<NUM_OF_VIRTUAL_CHANNELS; vc_num=vc_num+1)
 		begin : VIRTUAL_CHANNELS
@@ -371,8 +373,13 @@ generate
 			  & (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
 
 
-			assign previous_vc[vc_num] = (reset || vc_is_available[port_num][vc_num]) ? 
-											1'b0 : prev_vc;
+			always @(posedge clk)
+			begin
+				if(reset) previous_vc[vc_num] <= 0;
+				
+				else if(vc_is_to_be_allocated[port_num][vc_num]) 
+					previous_vc[vc_num] <= prev_vc;
+			end
 
 
 			// enqueues when 'data is valid' && ((available vc is granted permission) || 
@@ -381,8 +388,10 @@ generate
 			wire enqueue_en = (!reset & reset_previously) ? 
 						flit_data_input_are_valid[port_num] && (vc_num == 0) :
 
-						flit_data_input_are_valid[port_num] &&
-						((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num]) ||
+						flit_data_input_are_valid[port_num] && granted_vc_enqueue[vc_num] &&
+						((vc_is_available[port_num][vc_num] && 
+						 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEADER) ||
+						  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))) ||
 						(!vc_is_available[port_num][vc_num] && (prev_vc == previous_vc[vc_num]))) &&
 
 						(!current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]);
@@ -417,6 +426,7 @@ generate
 					vc_is_allocated_by_head_flit[port_num][vc_num] <= 1;
 			end
 
+			always @(posedge clk) cover(vc_is_allocated_by_head_flit[port_num][vc_num]);
 			
 			always @(posedge clk)
 			begin
