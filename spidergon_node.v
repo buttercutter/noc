@@ -436,8 +436,9 @@ generate
 				   vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit was here previously
 						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
-				else if(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER) &&
-						vc_is_allocated_by_head_flit[port_num][vc_num])
+				else if(enqueue_en && 
+				        ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT) ||  
+						 vc_is_allocated_by_head_flit[port_num][vc_num]))
 					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
 													flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH];
 			end
@@ -448,11 +449,21 @@ generate
 				begin
 					if($past(reset) || $past(vc_is_to_be_deallocated_previously[port_num][vc_num]))
 						assert(sum_data[port_num][vc_num] == 0);
+
+					else if($past(enqueue_en) && 
+						   (($past(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL]) == HEAD_FLIT) ||
+							 vc_is_allocated_by_head_flit_previously[port_num][vc_num]))
+						
+							assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]) + 
+									flit_data_input_previously[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
 				
 					else if(vc_is_allocated_by_head_flit_previously[port_num][vc_num] && 
-							vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit previously
-						assert(sum_data[port_num][vc_num] == // sum_data is only updated after 1 clock cycle
-								flit_data_input_previously[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+								vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit previously
+								
+							assert(sum_data[port_num][vc_num] == // sum_data is only updated after 1 clock cycle
+									flit_data_input_previously[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+								
+					else assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]));
 				end
 			end
 			
