@@ -4,7 +4,7 @@ cover
 
 [options]
 proof: mode prove
-proof: depth 10
+proof: depth 20
 
 cover: mode cover
 cover: depth 7

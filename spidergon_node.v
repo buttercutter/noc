@@ -466,6 +466,13 @@ generate
 					else assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]));
 				end
 			end
+
+			always @(posedge clk)
+			begin
+				if((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == BODY_FLIT) && 
+				   (vc_is_allocated_by_head_flit_previously[port_num][vc_num]))
+					assert(sum_data[port_num][vc_num] != 0);
+			end
 			
 			`endif
 
@@ -767,13 +774,13 @@ generate
 				end
 			end
 			
+			initial random_generated_head = TAIL_FLIT;
+			
 			always @(posedge clk)
 			begin
 				if(reset)
 				begin
 					random_generated_head <= TAIL_FLIT;
-					random_generated_data <= // could be $anyseq because don't care
-							{ACTUAL_DATA_PAYLOAD_WIDTH{1'b1}}; //this is just for easier debug
 				end
 				
 				else begin
@@ -782,7 +789,6 @@ generate
 					
 						HEAD_FLIT	: begin
 										random_generated_head <= BODY_FLIT;
-										random_generated_data <= {{OVERFLOW_PROTECT{1'b0}}, data0};
 									  end
 					
 						// for testing, sends 2 body flits
@@ -790,12 +796,10 @@ generate
 										if(previous_random_generated_head == HEAD_FLIT) 
 										begin
 											random_generated_head <= BODY_FLIT;
-											random_generated_data <= {{OVERFLOW_PROTECT{1'b0}}, data1};
 										end
 											
 										else begin
 											random_generated_head <= TAIL_FLIT; 
-											random_generated_data <= {{OVERFLOW_PROTECT{1'b0}}, data2};
 										end
 									  end
 						
@@ -805,11 +809,6 @@ generate
 												node_needs_to_send_its_own_data_previously[port_num] ? 
 															  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
 															  TAIL_FLIT;
-										if($past(random_generated_head) == BODY_FLIT) // ongoing transaction
-											random_generated_data <= data_sum;
-											
-										else random_generated_data <=  // could be $anyseq because don't care
-												{ACTUAL_DATA_PAYLOAD_WIDTH{1'b1}}; //this is just for easier debug
 									  end
 						
 						HEADER		: begin
@@ -817,13 +816,51 @@ generate
 										 		node_needs_to_send_its_own_data_previously[port_num] ? 
 															  ((header_or_head_flit) ? HEADER : HEAD_FLIT) : 
 															  TAIL_FLIT;
-										random_generated_data <= data0;
+									  end
+					endcase
+				end
+			end
+
+			always @(*)
+			begin
+				if(reset)
+				begin
+					random_generated_data = // could be $anyseq because don't care
+							{ACTUAL_DATA_PAYLOAD_WIDTH{1'b1}}; //this is just for easier debug
+				end
+				
+				else begin
+				
+					case(random_generated_head)
+					
+						HEAD_FLIT	: begin
+										random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data0};
+									  end
+					
+						// for testing, sends 2 body flits
+						BODY_FLIT	: begin
+										if(previous_random_generated_head == HEAD_FLIT) 
+										begin
+											random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data1};
+										end
+											
+										else begin
+											random_generated_data = {{OVERFLOW_PROTECT{1'b0}}, data2};
+										end
 									  end
 						
-						//default		: begin
-						//				random_generated_head <= TAIL_FLIT; // don't care
-						//				random_generated_data <= 0; // don't care
-						//			  end
+						// tail flit could either means the end of an ongoing transaction or no transaction
+						TAIL_FLIT	: begin				  
+										if(previous_random_generated_head == BODY_FLIT) // ongoing transaction
+											random_generated_data = data_sum;
+											
+										else random_generated_data =  // could be $anyseq because don't care
+											{ACTUAL_DATA_PAYLOAD_WIDTH{1'b1}}; //this is just for easier debug
+									  end
+						
+						HEADER		: begin
+										random_generated_data = data0;
+									  end
 					endcase
 				end
 			end
