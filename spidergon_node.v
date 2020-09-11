@@ -57,8 +57,6 @@ localparam ACTUAL_DATA_PAYLOAD_WIDTH = FLIT_DATA_WIDTH-DEST_NODE_WIDTH-DEST_NODE
 localparam NUM_OF_PORTS = 3; // clockwise, anti-clockwise, across
 localparam BIDIRECTIONAL_PER_PORT = 2; // two-way data traffic
 
-localparam CRC_BITWIDTH = 3; // CRC-3 output bitwidth
-
 
 input clk, reset;
 
@@ -242,14 +240,14 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 // let HEAD_TAIL = 2  to indicate flit type
 // let FLIT_TOTAL_WIDTH = HEAD_TAIL + FLIT_DATA_WIDTH
 
-// 18-bit head flit format as follows: {01, prev_vc, destination_node, source_node, 9 bits of data_payload}
+// 19-bit head flit format as follows: {01, prev_vc, destination_node, source_node, 10 bits of data_payload}
 // prev_vc consumes 1 bit, destination_node or source node consume 3 bits (8 nodes in total), 
-// so we are left with 9 bits in the head flit
-// these 9 bits could be data payload as well
+// so we are left with 10 bits in the head flit
+// these 10 bits could be data payload as well
 
-// 18-bit body flit format as follows: {10, prev_vc, 15 bits of data_payload}
-// 18-bit tail flit format as follows: {00, prev_vc, 15 bits of data_payload}
-// So, a single body_flit or tail_flit could carry 15 bits of data payload
+// 19-bit body flit format as follows: {10, prev_vc, 16 bits of data_payload}
+// 19-bit tail flit format as follows: {00, prev_vc, 16 bits of data_payload}
+// So, a single body_flit or tail_flit could carry 16 bits of data payload
 // tail flit will deallocate all the virtual channels along the path to the destination nodes
 
 // for wormhole switching flow control purpose 
@@ -630,8 +628,9 @@ generate
 		end
 
 
-		wire [(HEAD_TAIL-1) : 0] output_flit_type = 
-					node_data_from_cpu[(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL];
+		wire [(HEAD_TAIL-1) : 0] output_flit_type = (node_needs_to_send_its_own_data[port_num]) ?
+										node_own_data[port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] :
+										node_data_from_cpu[(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL];
 
 
 		// for the purpose of stopping transaction flow when tail_flit is received
@@ -865,103 +864,48 @@ generate
 				end
 			end
 		
-			always @(posedge clk)
+			always @(*)
 			begin
 				case(random_generated_head)
 				
 					HEAD_FLIT 	: 
 					begin
-						random_generated_vc <= $anyseq;
-						dest_node_for_sending_node_own_data[port_num] <= $anyseq;
-						node_needs_to_send_its_own_data[port_num] <= 1; // must send if head_flit is produced
+						random_generated_vc = $anyseq;
+						dest_node_for_sending_node_own_data[port_num] = $anyseq;
+						node_needs_to_send_its_own_data[port_num] = 1; // must send if head_flit is produced
 					end
 								  
 					BODY_FLIT 	: 
 					begin
-						random_generated_vc <= previous_random_generated_vc;
-						dest_node_for_sending_node_own_data[port_num] <=
+						random_generated_vc = previous_random_generated_vc;
+						
+						dest_node_for_sending_node_own_data[port_num] =
 							previous_dest_node_for_sending_node_own_data[port_num];
-						node_needs_to_send_its_own_data[port_num] <=
+							
+						node_needs_to_send_its_own_data[port_num] =
 							node_needs_to_send_its_own_data_previously[port_num];
 					end
 					
 					TAIL_FLIT 	: 
 					begin
-						random_generated_vc <= previous_random_generated_vc;
-						dest_node_for_sending_node_own_data[port_num] <=
+						random_generated_vc = previous_random_generated_vc;
+						
+						dest_node_for_sending_node_own_data[port_num] =
 							previous_dest_node_for_sending_node_own_data[port_num];
-						node_needs_to_send_its_own_data[port_num] <=
+							
+						node_needs_to_send_its_own_data[port_num] =
 							node_needs_to_send_its_own_data_previously[port_num];
 					end
 								  			
 					HEADER	 	: 
 					begin
-						random_generated_vc <= $anyseq;
-						dest_node_for_sending_node_own_data[port_num] <= $anyseq;
-						node_needs_to_send_its_own_data[port_num] <= $anyseq;
-					end
-					
-					default		:
-					begin
-						random_generated_vc <= $anyseq; // don't care
-						dest_node_for_sending_node_own_data[port_num] <= $anyseq; // don't care
-						node_needs_to_send_its_own_data[port_num] <= 0; // don't send
+						random_generated_vc = $anyseq;
+						dest_node_for_sending_node_own_data[port_num] = $anyseq;
+						node_needs_to_send_its_own_data[port_num] = $anyseq;
 					end
 					
 				endcase
-			end
-/*		
-			always @(posedge clk)
-			begin
-				if(reset) random_generated_data <= 0;
-				 
-				else random_generated_data <= $anyseq;
-			end
-*/
-/*
-			// CRC-3 computation occurs whenever a new data packet is to be sent out from source node
-		
-			localparam CRC_INPUT_BITWIDTH = FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS);
-		
-			integer crc_array_bit_location;
-		
-			wire [CRC_BITWIDTH:0] crc_3_divisor = 'b1011;
-		
-			wire [CRC_INPUT_BITWIDTH-1:0] crc_calculation_input = (node_needs_to_send_its_own_data[port_num]) ?
-			  {node_own_data[port_num][CRC_BITWIDTH +: (CRC_INPUT_BITWIDTH-CRC_BITWIDTH)], {CRC_BITWIDTH{1'b0}}} :
-			  {node_data_from_cpu[CRC_BITWIDTH +: (CRC_INPUT_BITWIDTH-CRC_BITWIDTH)], {CRC_BITWIDTH{1'b0}}};
-		
-			reg [CRC_INPUT_BITWIDTH-1:0] crc_intermediate_result;
-			wire [CRC_BITWIDTH-1:0] crc_final_result = crc_intermediate_result[0 +: CRC_BITWIDTH];
-				
-
-			// CRC-3 https://en.wikipedia.org/wiki/Cyclic_redundancy_check#Computation
-			always @(*)
-			begin
-				if(flit_data_output_are_valid[port_num])
-				begin
-					// this is only for formal verification of the NoC, 
-					// so it does not matter if the CRC-3 code is not hardware-friendly
-					// and CRC-3 will not be computed during actual hardware running
-					// at least in current hardware design
-					
-					crc_intermediate_result = crc_calculation_input;
-					
-					for(crc_array_bit_location = (CRC_INPUT_BITWIDTH-1); 
-					    crc_array_bit_location >= CRC_BITWIDTH;
-						crc_array_bit_location = crc_array_bit_location - 1)
-					begin
-						if(crc_intermediate_result[crc_array_bit_location])
-						begin
-							crc_intermediate_result = 
-							crc_intermediate_result ^ 
-							{{(CRC_INPUT_BITWIDTH-crc_array_bit_location-1){1'b0}}, crc_3_divisor, 
-     					 	 {(crc_array_bit_location-CRC_BITWIDTH){1'b0}}};
-						end
-					end
-				end
-			end
-*/			
+			end		
 			
 			assign node_own_data[port_num] = 
 					{
@@ -1003,13 +947,30 @@ generate
 		// needs some backpressure logic here
 		assign valid_output[port_num] = (reset) ? 
 
-					(direction[port_num] == port_num) && 
+					((direction[port_num] == port_num) || 
+					// The reasoning for the above || operator:
+					// because it is difficult to construct formal statements to constraint the formal signal
+					// 'dest_node_for_sending_node_own_data' to follow 'direction' output from 'router' module.
+					// It is okay to send out data packets through the wrong output channel  ('port_num'),
+					// as long as the next node is able to route the data packets back to the
+					// destination node correctly.					
+					(node_needs_to_send_its_own_data[port_num])) &&
+
 					((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
 
-					((direction[port_num] == port_num) && 
+
+					((direction[port_num] == port_num) || 
+					// The reasoning for the above || operator:
+					// because it is difficult to construct formal statements to constraint the formal signal
+					// 'dest_node_for_sending_node_own_data' to follow 'direction' output from 'router' module.
+					// It is okay to send out data packets through the wrong output channel  ('port_num'),
+					// as long as the next node is able to route the data packets back to the
+					// destination node correctly.					
+					(node_needs_to_send_its_own_data[port_num])) &&
+					
 					(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
-					(valid_output_previously[port_num] && 
-					 (output_flit_type == BODY_FLIT)) || node_needs_to_send_its_own_data_previously[port_num]));
+					 (valid_output_previously[port_num] && (output_flit_type == BODY_FLIT)) ||
+					 node_needs_to_send_its_own_data_previously[port_num]);
 
 
 		initial flit_data_output[port_num] = 0;
