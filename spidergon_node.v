@@ -148,6 +148,8 @@ reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated_previously [NUM_OF_POR
 
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_allocated_by_head_flit [NUM_OF_PORTS-1:0];
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_allocated_by_head_flit_previously [NUM_OF_PORTS-1:0];
+
+reg [FLIT_TOTAL_WIDTH-1:0] previous_data_input_to_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 `endif
 
 localparam DIRECTION_WIDTH = 2;
@@ -340,7 +342,7 @@ generate
 			flit_data_input_previously[port_num] <= flit_data_input[port_num];
 		`endif
 
-		reg [NUM_OF_VIRTUAL_CHANNELS-1:0] previous_vc;
+		reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] previous_vc [NUM_OF_VIRTUAL_CHANNELS-1:0];
 
 		for(vc_num=0; vc_num<NUM_OF_VIRTUAL_CHANNELS; vc_num=vc_num+1)
 		begin : VIRTUAL_CHANNELS
@@ -466,10 +468,17 @@ generate
 			end
 
 			always @(posedge clk)
+				previous_data_input_to_vc[port_num][vc_num] <= data_input_to_vc[port_num][vc_num];
+
+			always @(posedge clk)
 			begin
-				if((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == BODY_FLIT) && 
-				   (vc_is_allocated_by_head_flit_previously[port_num][vc_num]))
-					assert(sum_data[port_num][vc_num] != 0);
+				if(first_clock_had_passed &&
+				   (previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)
+				 && ($past(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL]) == 
+				 	 BODY_FLIT))
+				 	 
+					assert(sum_data[port_num][vc_num] == 
+							previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
 			end
 			
 			`endif
