@@ -388,8 +388,8 @@ generate
 			wire enqueue_en = (!reset & reset_previously) ? 
 						flit_data_input_are_valid[port_num] && (vc_num == 0) :
 
-						flit_data_input_are_valid[port_num] && granted_vc_enqueue[vc_num] &&
-						((vc_is_available[port_num][vc_num] && 
+						flit_data_input_are_valid[port_num] &&
+						((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num] && 
 						 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEADER) ||
 						  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))) ||
 						(!vc_is_available[port_num][vc_num] && (prev_vc == previous_vc[vc_num]))) &&
@@ -433,7 +433,7 @@ generate
 			always @(posedge clk)
 			begin
 				if(reset || 
-				   vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit was here previously
+				   vc_is_to_be_deallocated[port_num][vc_num]) // tail flit was here previously
 						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
 				else if(enqueue_en && 
@@ -447,7 +447,7 @@ generate
 			begin
 				if(first_clock_had_passed)
 				begin
-					if($past(reset) || $past(vc_is_to_be_deallocated_previously[port_num][vc_num]))
+					if($past(reset) || $past(vc_is_to_be_deallocated[port_num][vc_num]))
 						assert(sum_data[port_num][vc_num] == 0);
 
 					else if($past(enqueue_en) && 
@@ -472,7 +472,7 @@ generate
 
 			always @(posedge clk)
 			begin
-				if(first_clock_had_passed &&
+				if(first_clock_had_passed && (!$past(reset)) &&
 				   (previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)
 				 && ($past(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL]) == 
 				 	 BODY_FLIT))
