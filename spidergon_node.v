@@ -355,19 +355,30 @@ generate
 					vc_is_available[port_num][vc_num];
 
 
-			// (the next node has at least one available, non-reserved vc) OR 
-			// (any of the reserved vc (at next node) has sufficient buffer space)	
+			// (FOR head flit, header: the next node has at least one available, non-reserved vc) OR 
+			// (FOR body flit, tail flit: the reserved vc (at next node) has sufficient buffer space)	
 			// AND (to prevent competition of virtual channels for CPU)
-			wire dequeue_en = (direction[port_num] == STOP) ? 1'b0 :
-				  (((|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
-					NUM_OF_VIRTUAL_CHANNELS]) || (|adjacent_nodes_vc_are_reserved_and_not_full))
+			wire dequeue_en = ((direction[port_num] == STOP) || (node_needs_to_send_its_own_data[port_num])) ?
+			 					1'b0 :
+			
+					// backpressure mechanism for first flit
+				  (((((data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
+				      (data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
+				      (|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
+							NUM_OF_VIRTUAL_CHANNELS])) || 
+						
+					// backpressure mechanism for subsequent flits
+					(((data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
+					  (data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
+					  (|adjacent_nodes_vc_are_reserved_and_not_full)))
+					  
 					&& (!requests_from_multiple_ports ||
 						requests_from_multiple_ports &&
 					 	requests_in_ports_have_been_served[port_num]));
 
 
 			assign adjacent_nodes_vc_are_reserved_and_not_full[vc_num] = 
-				(direction[port_num] == STOP) ? 1'b0 :					
+				//(direction[port_num] == STOP) ? 1'b0 :					
 
 			  ((!adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]) 
 			  & (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
@@ -791,7 +802,8 @@ generate
 					random_generated_head <= TAIL_FLIT;
 				end
 				
-				else begin
+				// backpressure mechanism
+				else if(valid_output[port_num]) begin
 				
 					case(random_generated_head)
 					
@@ -923,7 +935,10 @@ generate
 						current_node, // source node
 
 						random_generated_data
-					};		
+					};	
+					
+			always @(posedge clk) // try not to send out some data back to node itself, it is pointless
+				assume(dest_node_for_sending_node_own_data[port_num] != current_node);	
 		`else
 
 			reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] random_generated_data;
@@ -953,7 +968,7 @@ generate
 		always @(posedge clk) 
 			node_needs_to_send_its_own_data_previously[port_num] <= node_needs_to_send_its_own_data[port_num];
 
-		// needs some backpressure logic here
+
 		assign valid_output[port_num] = (reset) ? 
 
 					((direction[port_num] == port_num) || 
@@ -979,7 +994,11 @@ generate
 					
 					(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
 					 (valid_output_previously[port_num] && (output_flit_type == BODY_FLIT)) ||
-					 node_needs_to_send_its_own_data_previously[port_num]);
+					 node_needs_to_send_its_own_data_previously[port_num]) &&
+					 
+					 // backpressure mechanism
+					 (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
+					   flit_data_output[port_num][FLIT_DATA_WIDTH +: VIRTUAL_CHANNELS_BITWIDTH]]);
 
 
 		initial flit_data_output[port_num] = 0;
@@ -997,7 +1016,6 @@ generate
 			end
 			
 			else if(valid_output[port_num]) begin
-				// needs some backpressure logic here
 				// sends out data from cpu to physical channel
 				flit_data_output[port_num] <= (node_needs_to_send_its_own_data[port_num]) ?
 												node_own_data[port_num] : node_data_from_cpu;
