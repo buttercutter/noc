@@ -124,6 +124,7 @@ always @(posedge clk) third_clock_had_passed <= second_clock_had_passed;
 `endif
 
 // these virtual channel buffers are at input port side
+wire [FLIT_TOTAL_WIDTH-1:0] data_out_from_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 wire [FLIT_TOTAL_WIDTH-1:0] data_output_from_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 wire [FLIT_TOTAL_WIDTH-1:0] data_input_to_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 
@@ -206,7 +207,7 @@ begin
 			(vc_buffer_is_empty[granted_port_index][granted_vc_index[granted_port_index]])) 
 		node_data_to_cpu = 0;
 
-	else node_data_to_cpu = data_output_from_vc[granted_port_index][granted_vc_index[granted_port_index]];
+	else node_data_to_cpu = data_out_from_vc[granted_port_index][granted_vc_index[granted_port_index]];
 end
 
 
@@ -343,6 +344,7 @@ generate
 		`endif
 
 		reg [VIRTUAL_CHANNELS_BITWIDTH-1:0] previous_vc [NUM_OF_VIRTUAL_CHANNELS-1:0];
+		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] matching_vc;
 
 		for(vc_num=0; vc_num<NUM_OF_VIRTUAL_CHANNELS; vc_num=vc_num+1)
 		begin : VIRTUAL_CHANNELS
@@ -362,14 +364,14 @@ generate
 			 					1'b0 :
 			
 					// backpressure mechanism for first flit
-				  (((((data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
-				      (data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
+				  (((((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
+				      (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
 				      (|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
 							NUM_OF_VIRTUAL_CHANNELS])) || 
 						
 					// backpressure mechanism for subsequent flits
-					(((data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
-					  (data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
+					(((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
+					  (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
 					  (|adjacent_nodes_vc_are_reserved_and_not_full)))
 					  
 					&& (!requests_from_multiple_ports ||
@@ -513,11 +515,13 @@ generate
 				.dequeue_value(data_output_from_vc[port_num][vc_num])
 			);
 	
-			assign data_input_to_vc[port_num][vc_num] = // modify the vc value for wormhole switching purpose
+			assign data_input_to_vc[port_num][vc_num] = flit_data_input[port_num];
+	
+			assign data_out_from_vc[port_num][vc_num] = // modify the vc value for wormhole switching purpose
 				{
-					flit_data_input[port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL], // no change
+					data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL], // no change
 				 	vc_num[VIRTUAL_CHANNELS_BITWIDTH-1:0], // modified for proper vc allocation and de-allocation
-				 	flit_data_input[port_num][0 +: FLIT_DATA_WIDTH] // no change
+				 	data_output_from_vc[port_num][vc_num][0 +: FLIT_DATA_WIDTH] // no change
 				};
 
 			assign vc_is_available[port_num][vc_num] = !req[port_num][vc_num];
@@ -645,7 +649,19 @@ generate
 
 			`endif
 
+			// checks which virtual channel in the next node is actually reserved by current flit
+			// this is for backpressure mechanism
+			
+			assign matching_vc[vc_num] = (node_needs_to_send_its_own_data[port_num]) ?
+			(previous_vc[vc_num] == node_own_data[port_num][FLIT_DATA_WIDTH +: VIRTUAL_CHANNELS_BITWIDTH]) :
+			(previous_vc[vc_num] == data_output_from_vc[port_num][vc_num][FLIT_DATA_WIDTH +:
+			 																VIRTUAL_CHANNELS_BITWIDTH]);
 		end
+		
+		wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number;
+		
+		// for one-hot encoding to binary encoding conversion
+		oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) port_index (.one_hot(matching_vc), .index(matching_vc_number));
 
 
 		wire [(HEAD_TAIL-1) : 0] output_flit_type = (node_needs_to_send_its_own_data[port_num]) ?
@@ -968,13 +984,12 @@ generate
 		always @(posedge clk) 
 			node_needs_to_send_its_own_data_previously[port_num] <= node_needs_to_send_its_own_data[port_num];
 
-
 		assign valid_output[port_num] = (reset) ? 
 
 					((direction[port_num] == port_num) || 
 					// The reasoning for the above || operator:
-					// because it is difficult to construct formal statements to constraint the formal signal
-					// 'dest_node_for_sending_node_own_data' to follow 'direction' output from 'router' module.
+					// because it is difficult to construct formal statements to constrain the formal signal
+					// ('dest_node_for_sending_node_own_data') to follow 'direction' output from 'router' module.
 					// It is okay to send out data packets through the wrong output channel  ('port_num'),
 					// as long as the next node is able to route the data packets back to the
 					// destination node correctly.					
@@ -985,8 +1000,8 @@ generate
 
 					((direction[port_num] == port_num) || 
 					// The reasoning for the above || operator:
-					// because it is difficult to construct formal statements to constraint the formal signal
-					// 'dest_node_for_sending_node_own_data' to follow 'direction' output from 'router' module.
+					// because it is difficult to construct formal statements to constrain the formal signal
+					// ('dest_node_for_sending_node_own_data') to follow 'direction' output from 'router' module.
 					// It is okay to send out data packets through the wrong output channel  ('port_num'),
 					// as long as the next node is able to route the data packets back to the
 					// destination node correctly.					
@@ -997,8 +1012,13 @@ generate
 					 node_needs_to_send_its_own_data_previously[port_num]) &&
 					 
 					 // backpressure mechanism
-					 (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
-					   flit_data_output[port_num][FLIT_DATA_WIDTH +: VIRTUAL_CHANNELS_BITWIDTH]]);
+					 ((node_needs_to_send_its_own_data[port_num]) && 
+					  (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
+					   matching_vc_number]) ||
+					   
+					  ((!node_needs_to_send_its_own_data[port_num]) && 
+					  (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
+					   matching_vc_number])));
 
 
 		initial flit_data_output[port_num] = 0;
