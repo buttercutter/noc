@@ -26,7 +26,8 @@ module spidergon_node
 	node_data_from_cpu, node_data_to_cpu, data_input,
 	flit_data_input_are_valid, flit_data_output_are_valid,
 	current_node_is_ready, adjacent_nodes_are_ready,
-	current_node_vc_are_full, adjacent_node_vc_are_full
+	current_node_vc_are_full, adjacent_node_vc_are_full,
+	current_node_previous_vc_table, adjacent_node_previous_vc_table
 );
 
 
@@ -85,6 +86,10 @@ output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_is_ready;
 // to indicate to the node about the virtual channel buffers fill status
 input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_full;
 output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full;
+
+// to indicate to the node about the virtual channel buffers fill status
+input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] adjacent_node_previous_vc_table;
+output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] current_node_previous_vc_table;
 
 
 `ifdef FORMAL
@@ -224,13 +229,13 @@ always @(posedge clk) reset_previously <= reset;
 reg [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
 reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] sum_data [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0]; // for verifying vc logic 
+reg [DEST_NODE_WIDTH-1:0] previous_dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 `else
 // For each node, every ports could send different data in the same clock cycle to different destination nodes
 wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
 `endif
 
-reg [DEST_NODE_WIDTH-1:0] previous_dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
 wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 
@@ -281,6 +286,8 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 	5. A table costs 36 bits (NUM_OF_ROWS*(2+1+1+1+1))
 */
 
+reg [VIRTUAL_CHANNELS_BITWIDTH:0] previous_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
+		
 
 genvar port_num;
 genvar vc_num;
@@ -307,6 +314,21 @@ generate
 			.index(granted_vc_index[port_num])
 		);
 
+
+		// path routing computation block for each input ports
+		router #(NUM_OF_NODES) rt 
+		(
+			//.clk(clk),
+
+			// see the math logic in router.v on why we set it to 'current_node' for tail_flit
+			.dest_node((stop_flow && !node_needs_to_send_its_own_data[port_num]) ? 
+							current_node :
+							(node_needs_to_send_its_own_data[port_num]) ?
+							 dest_node_for_sending_node_own_data[port_num] : dest_node[port_num]), 
+			.current_node(current_node), 
+			.direction(direction[port_num])
+		);
+		
 
 		`ifdef FORMAL
 			assign out_port_num[port_num*DIRECTION_WIDTH +: DIRECTION_WIDTH] = direction[port_num];
@@ -343,7 +365,6 @@ generate
 			flit_data_input_previously[port_num] <= flit_data_input[port_num];
 		`endif
 
-		reg [VIRTUAL_CHANNELS_BITWIDTH:0] previous_vc [NUM_OF_VIRTUAL_CHANNELS-1:0];
 		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] matching_vc;
 
 		for(vc_num=0; vc_num<NUM_OF_VIRTUAL_CHANNELS; vc_num=vc_num+1)
@@ -355,6 +376,11 @@ generate
 			// (vc buffer is not reserved)
 			assign current_node_is_ready[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num] =
 					vc_is_available[port_num][vc_num];
+
+			assign current_node_previous_vc_table
+			 [((port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num)*(VIRTUAL_CHANNELS_BITWIDTH+1)) +:
+			  												(VIRTUAL_CHANNELS_BITWIDTH+1)]
+			 			= previous_vc[port_num][vc_num];
 
 
 			// (FOR head flit, header: the next node has at least one available, non-reserved vc) OR 
@@ -389,13 +415,13 @@ generate
 			always @(posedge clk)
 			begin
 				if(reset) 
-					previous_vc[vc_num] <= 
+					previous_vc[port_num][vc_num] <= 
 						NON_EXISTENCE_VC_NUM; // not allowing vc matching when wormhole switching is not started
 				
 				else if(vc_is_to_be_allocated[port_num][vc_num]) // wormhole switching will start in next cycle
-					previous_vc[vc_num] <= {1'b0, prev_vc};
+					previous_vc[port_num][vc_num] <= {1'b0, prev_vc};
 					
-				else previous_vc[vc_num] <= 
+				else previous_vc[port_num][vc_num] <= 
 						NON_EXISTENCE_VC_NUM; // not allowing vc matching when wormhole switching is not started
 			end
 
@@ -404,15 +430,15 @@ generate
 			// ('vc is reserved' by the same 'head flit')) && '!current vc is full'
 
 			wire enqueue_en = (!reset & reset_previously) ? 
-						flit_data_input_are_valid[port_num] && (vc_num == 0) :
+				flit_data_input_are_valid[port_num] && (vc_num == 0) :
 
-						flit_data_input_are_valid[port_num] &&
-						((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num] && 
-						 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEADER) ||
-						  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))) ||
-						(!vc_is_available[port_num][vc_num] && ({1'b0, prev_vc} == previous_vc[vc_num]))) &&
+				flit_data_input_are_valid[port_num] &&
+				((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num] && 
+				 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEADER) ||
+				  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))) ||
+				(!vc_is_available[port_num][vc_num] && ({1'b0, prev_vc} == previous_vc[port_num][vc_num]))) &&
 
-						(!current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]);
+				(!current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]);
 
 			`ifdef FORMAL
 			
@@ -555,7 +581,8 @@ generate
 					(req_previous[port_num][vc_num] && flit_data_input_are_valid[port_num] &&
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
 					(enqueue_en) && // still needs to enqueue 1 last flit (tail flit) into vc before deallocation
-					({1'b0, prev_vc} == previous_vc[vc_num])) && (requests_in_ports_have_been_served[port_num]);
+					({1'b0, prev_vc} == previous_vc[port_num][vc_num])) &&
+					(requests_in_ports_have_been_served[port_num]);
 
 			initial req[port_num][vc_num] = 0;
 
@@ -657,12 +684,17 @@ generate
 			// checks which virtual channel in the next node is actually reserved by current flit
 			// this is for backpressure mechanism
 			
-			assign matching_vc[vc_num] = (node_needs_to_send_its_own_data[port_num]) ?
-					(previous_vc[vc_num] == {1'b0, node_own_data[port_num][FLIT_DATA_WIDTH +:
-			 														VIRTUAL_CHANNELS_BITWIDTH]}) :
-			 														
-					(previous_vc[vc_num] == {1'b0, data_output_from_vc[port_num][vc_num][FLIT_DATA_WIDTH +:
-			 														VIRTUAL_CHANNELS_BITWIDTH]});
+			assign matching_vc[vc_num] = (direction[port_num] == port_num) && 
+							(node_needs_to_send_its_own_data[port_num]) ?
+			
+				(adjacent_node_previous_vc_table[((port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num)*
+												(VIRTUAL_CHANNELS_BITWIDTH+1)) +: (VIRTUAL_CHANNELS_BITWIDTH+1)] 
+				  	== {1'b0, node_own_data[port_num][FLIT_DATA_WIDTH +: VIRTUAL_CHANNELS_BITWIDTH]}) :
+		 														
+				(adjacent_node_previous_vc_table[((port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num)*
+												(VIRTUAL_CHANNELS_BITWIDTH+1)) +: (VIRTUAL_CHANNELS_BITWIDTH+1)] 
+				  	== {1'b0, data_output_from_vc[port_num][vc_num][FLIT_DATA_WIDTH +:
+				  	 												VIRTUAL_CHANNELS_BITWIDTH]});
 		end
 		
 		wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number;
@@ -686,19 +718,7 @@ generate
 				data_input[(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH] :
 				flit_data_input[port_num][(FLIT_DATA_WIDTH-1) -: DEST_NODE_WIDTH];
 
-		// path routing computation block for each input ports
-		router #(NUM_OF_NODES) rt 
-		(
-			//.clk(clk),
 
-			// see the math logic in router.v on why we set it to 'current_node' for tail_flit
-			.dest_node((stop_flow && !node_needs_to_send_its_own_data[port_num]) ? 
-							current_node :
-							(node_needs_to_send_its_own_data[port_num]) ?
-							 dest_node_for_sending_node_own_data[port_num] : dest_node[port_num]), 
-			.current_node(current_node), 
-			.direction(direction[port_num])
-		);
 
 		initial valid_output_previously[port_num] = 0;
 		always @(posedge clk) valid_output_previously[port_num] <= valid_output[port_num];

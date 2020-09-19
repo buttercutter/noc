@@ -62,8 +62,6 @@ begin
 	else double_grant <= double_req & ~(double_req - {{(WIDTH){1'b0}}, base});
 end
 
-reg [WIDTH-1:0] req_previous;
-always @(posedge clk) req_previous <= req;
 
 always @(*)
 begin
@@ -93,6 +91,9 @@ generate
 endgenerate
 
 always @(posedge clk) cover(!$past(reset) && (grant == 0)); // covers the ability to go to an idle state
+
+reg [WIDTH-1:0] req_previous;
+always @(posedge clk) req_previous <= req;
 
 // covers the ability to handle requests properly even with ALL requests ON
 always @(posedge clk) cover((&$past(req_previous)) && (&$past(req)) && (&req) && first_clock_had_passed && $past(first_clock_had_passed) && ((grant & $past(req)) == grant)); 
