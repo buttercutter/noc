@@ -230,13 +230,13 @@ reg [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0]
 reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
 reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] sum_data [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0]; // for verifying vc logic 
 reg [DEST_NODE_WIDTH-1:0] previous_dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
+reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
 `else
 // For each node, every ports could send different data in the same clock cycle to different destination nodes
 wire [DEST_NODE_WIDTH-1:0] dest_node_for_sending_node_own_data [NUM_OF_PORTS-1:0];
 wire [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data; // there are 'NUM_OF_PORTS' ports to send data to
 `endif
 
-reg [NUM_OF_PORTS-1:0] node_needs_to_send_its_own_data_previously;
 wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 
 
@@ -421,8 +421,8 @@ generate
 				else if(vc_is_to_be_allocated[port_num][vc_num]) // wormhole switching will start in next cycle
 					previous_vc[port_num][vc_num] <= {1'b0, prev_vc};
 					
-				else previous_vc[port_num][vc_num] <= 
-						NON_EXISTENCE_VC_NUM; // not allowing vc matching when wormhole switching is not started
+				//else previous_vc[port_num][vc_num] <= 
+					//NON_EXISTENCE_VC_NUM; // not allowing vc matching when wormhole switching is not started
 			end
 
 			// enqueues when 'data is valid' && (vc is granted permission from rr arbiter) &&
@@ -982,6 +982,11 @@ generate
 					
 			always @(posedge clk) // try not to send out some data back to node itself, it is pointless
 				assume(dest_node_for_sending_node_own_data[port_num] != current_node);	
+				
+			always @(posedge clk) 
+				node_needs_to_send_its_own_data_previously[port_num] <=
+			 			   node_needs_to_send_its_own_data[port_num];				
+				
 		`else
 
 			reg [ACTUAL_DATA_PAYLOAD_WIDTH-1:0] random_generated_data;
@@ -1008,44 +1013,20 @@ generate
 					}; 	
 		`endif		
 
-		always @(posedge clk) 
-			node_needs_to_send_its_own_data_previously[port_num] <= node_needs_to_send_its_own_data[port_num];
 
 		assign valid_output[port_num] = (reset) ? 
 
-					(//(node_needs_to_send_its_own_data[port_num]) || 
-					// The reasoning for the above || operator:
-					// because it is difficult to construct formal statements to constrain the formal signal
-					// ('dest_node_for_sending_node_own_data') to follow 'direction' output from 'router' module.
-					// It is okay to send out data packets through the wrong output channel  ('port_num'),
-					// as long as the next node is able to route the data packets back to the
-					// destination node correctly.					
-					(direction[port_num] == port_num)) &&
-
-					((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
-
-
-					(//(node_needs_to_send_its_own_data[port_num]) || 
-					// The reasoning for the above || operator:
-					// because it is difficult to construct formal statements to constrain the formal signal
-					// ('dest_node_for_sending_node_own_data') to follow 'direction' output from 'router' module.
-					// It is okay to send out data packets through the wrong output channel  ('port_num'),
-					// as long as the next node is able to route the data packets back to the
-					// destination node correctly.					
-					(direction[port_num] == port_num)) &&
-					
-					(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
-					 (valid_output_previously[port_num] && (output_flit_type == BODY_FLIT)) ||
-					 node_needs_to_send_its_own_data_previously[port_num]) &&
-					 
-					 // backpressure mechanism
-					 ((node_needs_to_send_its_own_data[port_num]) && 
-					  (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
-					   matching_vc_number]) ||
-					   
-					  ((!node_needs_to_send_its_own_data[port_num]) && 
-					  (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
-					   matching_vc_number])));
+				(direction[port_num] == port_num) &&
+				((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
+				
+				(direction[port_num] == port_num) &&
+				
+				(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
+				 (valid_output_previously[port_num] && 
+				 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT))) &&
+				 
+				 // backpressure mechanism
+				(~adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + matching_vc_number]);
 
 
 		initial flit_data_output[port_num] = 0;
