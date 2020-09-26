@@ -16,6 +16,8 @@ module spidergon_top
 ) 
 (clk, reset, data_input, data_output);
 
+parameter VIRTUAL_CHANNELS_BITWIDTH = $clog2(NUM_OF_VIRTUAL_CHANNELS);
+parameter DEST_NODE_WIDTH = $clog2(NUM_OF_NODES);
 
 // the most significant two bits are to indicate head and/or tail flits,
 // followed by dest_node and flit_data_payload
@@ -28,7 +30,6 @@ localparam BODY_FLIT = 2'b10;
 localparam TAIL_FLIT = 2'b00;
 
 localparam HEAD_TAIL = 2;
-parameter DEST_NODE_WIDTH = $clog2(NUM_OF_NODES);
 localparam FLIT_TOTAL_WIDTH = HEAD_TAIL+$clog2(NUM_OF_VIRTUAL_CHANNELS)+FLIT_DATA_WIDTH;
 
 localparam DIRECTION_WIDTH = 2; // $clog2(NUM_OF_PORTS)
@@ -41,8 +42,6 @@ localparam ANTI_CLOCKWISE = 0;
 
 // for user application mapping, this value must be smaller than NUM_OF_NODES
 localparam NUM_OF_INPUTS = 16;
-
-localparam CRC_BITWIDTH = 3; // CRC-3 output bitwidth
 
 
 input clk, reset;
@@ -67,6 +66,12 @@ wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_are_ready [NUM_OF
 // to control the flow, acts as traffic light for the data flits
 wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full[NUM_OF_NODES-1:0];
 wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_full[NUM_OF_NODES-1:0];
+
+// to control the flow, acts as traffic light for the data flits
+wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] 
+												current_node_previous_vc_table[NUM_OF_NODES-1:0];
+wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0]
+ 												adjacent_node_previous_vc_table[NUM_OF_NODES-1:0];
 
 
 // Final result output from user application mapping
@@ -124,11 +129,22 @@ generate
 			assign flit_data_input_are_valid[node_num][ANTI_CLOCKWISE] = 
 				   flit_data_output_are_valid[NUM_OF_NODES-1][CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] = 
-				   current_node_vc_are_full[NUM_OF_NODES-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+			assign adjacent_node_vc_are_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] = 
+				   current_node_vc_are_full[NUM_OF_NODES-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				    										NUM_OF_VIRTUAL_CHANNELS];
 
-			assign adjacent_nodes_are_ready[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_is_ready[NUM_OF_NODES-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+			assign adjacent_nodes_are_ready[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_is_ready[NUM_OF_NODES-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				    										NUM_OF_VIRTUAL_CHANNELS];
+				   
+			assign adjacent_node_previous_vc_table[node_num]
+				[ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+				 				NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)] =
+				   current_node_previous_vc_table[NUM_OF_NODES-1]
+				  	[CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+				  			   NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)];
 		end			
 		
 		else begin
@@ -137,11 +153,22 @@ generate
 			assign flit_data_input_are_valid[node_num][ANTI_CLOCKWISE] = 
 				   flit_data_output_are_valid[node_num-1][CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+			assign adjacent_node_vc_are_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_vc_are_full[node_num-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				    									NUM_OF_VIRTUAL_CHANNELS];
 
-			assign adjacent_nodes_are_ready[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_is_ready[node_num-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+			assign adjacent_nodes_are_ready[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_is_ready[node_num-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				    									NUM_OF_VIRTUAL_CHANNELS];
+				   
+			assign adjacent_node_previous_vc_table[node_num]
+				[ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+				 				NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)] =
+				   current_node_previous_vc_table[node_num-1]
+				   	[CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+				   			   NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)];
 		end
 
 
@@ -152,11 +179,20 @@ generate
 			assign flit_data_input_are_valid[node_num][CLOCKWISE] = 
 				   flit_data_output_are_valid[0][ANTI_CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[0][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];		
+			assign adjacent_node_vc_are_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_vc_are_full[0][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
 
-			assign adjacent_nodes_are_ready[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_is_ready[0][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];		
+			assign adjacent_nodes_are_ready[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_is_ready[0][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+				   	
+			assign adjacent_node_previous_vc_table[node_num]
+				[CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +: 
+						   NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)] =
+				   current_node_previous_vc_table[0]
+				   	[ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+				    				NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)];				   	
 		end
 
 		else begin
@@ -165,11 +201,22 @@ generate
 			assign flit_data_input_are_valid[node_num][CLOCKWISE] = 
 				   flit_data_output_are_valid[node_num+1][ANTI_CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num+1][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+			assign adjacent_node_vc_are_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_vc_are_full[node_num+1][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				    									NUM_OF_VIRTUAL_CHANNELS];
 
-			assign adjacent_nodes_are_ready[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_is_ready[node_num+1][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+			assign adjacent_nodes_are_ready[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			 											NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_is_ready[node_num+1][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				    									NUM_OF_VIRTUAL_CHANNELS];
+				   
+			assign adjacent_node_previous_vc_table[node_num]
+					[CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+					 		   NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)] =
+				   current_node_previous_vc_table[node_num+1]
+				   	[ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+				   	 				NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)];
 		end
 
 
@@ -181,10 +228,19 @@ generate
 				   flit_data_output_are_valid[node_num-(NUM_OF_NODES>>1)][ACROSS];
 
 			assign adjacent_node_vc_are_full[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num-(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+				   current_node_vc_are_full[node_num-(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
+				    													NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_is_ready[node_num-(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+				   current_node_is_ready[node_num-(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
+				    													NUM_OF_VIRTUAL_CHANNELS];
+				   
+			assign adjacent_node_previous_vc_table[node_num]
+				[ACROSS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+			 			NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)] =
+				   current_node_previous_vc_table[node_num-(NUM_OF_NODES>>1)]
+				   	[ACROSS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+				    		NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)];
 		end
 
 		else begin
@@ -194,10 +250,19 @@ generate
 				   flit_data_output_are_valid[node_num+(NUM_OF_NODES>>1)][ACROSS];
 
 			assign adjacent_node_vc_are_full[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num+(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+				   current_node_vc_are_full[node_num+(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
+				    													NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_is_ready[node_num+(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+				   current_node_is_ready[node_num+(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
+				    													NUM_OF_VIRTUAL_CHANNELS];
+				   
+			assign adjacent_node_previous_vc_table[node_num]
+				[ACROSS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+						NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)] =
+				   current_node_previous_vc_table[node_num+(NUM_OF_NODES>>1)]
+				   	[ACROSS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1) +:
+							NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)];
 		end
 
 
@@ -249,73 +314,13 @@ generate
 
 			// backpressure signals
 			.current_node_vc_are_full(current_node_vc_are_full[node_num]),  // output
-			.adjacent_node_vc_are_full(adjacent_node_vc_are_full[node_num]) // input
+			.adjacent_node_vc_are_full(adjacent_node_vc_are_full[node_num]), // input
+			
+			// signals that track previous virtual channels for wormhole switching purpose
+			.current_node_previous_vc_table(current_node_previous_vc_table[node_num]),  // output
+			.adjacent_node_previous_vc_table(adjacent_node_previous_vc_table[node_num]) // input			
 		);
 
-/*
-		// What about packet-retransmission due to data CRC integrity error ?
-		// will implement this later because the consequences of such a rare failure 
-		// are not high enough to justify effort to mitigate it now
-
-		`ifdef FORMAL
-		
-		// CRC-3 computation check occurs whenever a data packet goes from one node to the next node
-		
-		localparam CRC_INPUT_BITWIDTH = FLIT_TOTAL_WIDTH-HEAD_TAIL-$clog2(NUM_OF_VIRTUAL_CHANNELS);
-		
-		integer crc_array_bit_location;
-		
-		generate
-			genvar port_num;
-
-			for(port_num = 0; port_num < NUM_OF_PORTS; port_num = port_num + 1)
-			begin : CRC
-			
-				wire [CRC_BITWIDTH:0] crc_3_divisor = 'b1011;
-			
-				wire [CRC_INPUT_BITWIDTH-1:0] crc_calculation_input
-					= flit_data_input[node_num][port_num][0 +: CRC_INPUT_BITWIDTH];
-			
-				reg [CRC_INPUT_BITWIDTH-1:0] crc_intermediate_result;
-				wire [CRC_BITWIDTH-1:0] crc_final_result = crc_intermediate_result[0 +: CRC_BITWIDTH];
-			
-				always @(*) 
-					if(first_clock_had_passed && flit_data_input_are_valid[node_num][port_num])
-						assert(crc_final_result == 0); // no CRC data integrity error
-				
-			
-				// CRC-3 https://en.wikipedia.org/wiki/Cyclic_redundancy_check#Computation
-				always @(*)
-				begin
-					if(flit_data_input_are_valid[node_num][port_num])
-					begin
-						// this is only for formal verification of the NoC, 
-						// so it does not matter if the CRC-3 code is not hardware-friendly
-						// and CRC-3 will not be computed during actual hardware running
-						// at least in current hardware design
-						
-						crc_intermediate_result = crc_calculation_input;
-						
-						for(crc_array_bit_location = (CRC_INPUT_BITWIDTH-1); 
-						    crc_array_bit_location >= CRC_BITWIDTH;
-							crc_array_bit_location = crc_array_bit_location - 1)
-						begin
-							if(crc_intermediate_result[crc_array_bit_location])
-							begin
-								crc_intermediate_result = 
-								crc_intermediate_result ^ 
-								{{(CRC_INPUT_BITWIDTH-crc_array_bit_location-1){1'b0}}, crc_3_divisor, 
-         					 	 {(crc_array_bit_location-CRC_BITWIDTH){1'b0}}};
-							end
-						end
-					end
-				end
-			end
-			
-		endgenerate
-		
-		`endif
-*/
 
 		// See the overall spidergon hardware architecture at https://i.imgur.com/6d9E1JT.png
 		// for Spidergon NoC functional verification and testing only, 
