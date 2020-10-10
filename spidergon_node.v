@@ -289,7 +289,8 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 */
 
 reg [VIRTUAL_CHANNELS_BITWIDTH:0] previous_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
-		
+wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0];	
+
 
 genvar port_num;
 genvar vc_num;
@@ -391,20 +392,21 @@ generate
 			wire dequeue_en = ((direction[port_num] == STOP) || (node_needs_to_send_its_own_data[port_num])) ?
 			 					1'b0 :
 			
-					// backpressure mechanism for first flit
-				  (((((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
-				      (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
-				      (|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
-							NUM_OF_VIRTUAL_CHANNELS])) || 
-						
-					// backpressure mechanism for subsequent flits
-					(((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
-					  (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
-					  (|adjacent_nodes_vc_are_reserved_and_not_almost_full)))
-					  
-					&& (!requests_from_multiple_ports ||
-						requests_from_multiple_ports &&
-					 	requests_in_ports_have_been_served[port_num]));
+				// backpressure mechanism for first flit
+			  (((((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
+			      (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
+			      (|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
+						NUM_OF_VIRTUAL_CHANNELS])) || 
+					
+				// backpressure mechanism for subsequent flits
+				(((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
+				  (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
+				 (adjacent_nodes_vc_are_reserved_and_not_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS 
+				  + matching_vc_number[vc_num]])))
+				  
+				&& (!requests_from_multiple_ports ||
+					requests_from_multiple_ports &&
+				 	requests_in_ports_have_been_served[port_num]));
 
 
 			assign adjacent_nodes_vc_are_reserved_and_not_almost_full[vc_num] = 
@@ -698,12 +700,12 @@ generate
 												(VIRTUAL_CHANNELS_BITWIDTH+1)) +: (VIRTUAL_CHANNELS_BITWIDTH+1)] 
 				  	== {1'b0, data_output_from_vc[port_num][vc_num][FLIT_DATA_WIDTH +:
 				  	 												VIRTUAL_CHANNELS_BITWIDTH]});
+			
+			// for one-hot encoding to binary encoding conversion
+			oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) port_index
+			 		(.one_hot(matching_vc), .index(matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num]));
+
 		end
-		
-		wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number;
-		
-		// for one-hot encoding to binary encoding conversion
-		oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) port_index (.one_hot(matching_vc), .index(matching_vc_number));
 
 
 		wire [(HEAD_TAIL-1) : 0] output_flit_type = (node_needs_to_send_its_own_data[port_num]) ?
@@ -1029,12 +1031,14 @@ generate
 			 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT))) &&
 			 
 			 // backpressure mechanism , needs to have 1 clock cycle in advance to prevent buffer overloading
-			(~adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS+matching_vc_number]);
+			(~adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS+
+												matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS]]);
 
 		`ifdef FORMAL
 		
 		(* keep *) wire [$clog2(NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS)-1:0] debug_signal_1 =
-								direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + matching_vc_number;
+								direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
+											matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS];
 		`endif
 
 		initial flit_data_output[port_num] = 0;

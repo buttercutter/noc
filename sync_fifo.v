@@ -45,7 +45,7 @@ module sync_fifo
     (input                       clk,
     input                        reset,
     output		                 full,
-    output reg    	             almost_full,
+    output 	    	             almost_full,
     input                        enqueue_en,
     input [WIDTH - 1:0]          enqueue_value,
     output		                 empty,
