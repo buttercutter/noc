@@ -26,7 +26,7 @@ module spidergon_node
 	node_data_from_cpu, node_data_to_cpu, data_input,
 	flit_data_input_are_valid, flit_data_output_are_valid,
 	current_node_is_ready, adjacent_nodes_are_ready,
-	current_node_vc_are_full, adjacent_node_vc_are_full,
+	current_node_vc_are_almost_full, adjacent_node_vc_are_almost_full,
 	current_node_previous_vc_table, adjacent_node_previous_vc_table
 );
 
@@ -84,8 +84,8 @@ input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_are_ready;
 output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_is_ready;
 
 // to indicate to the node about the virtual channel buffers fill status
-input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_full;
-output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full;
+input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_almost_full;
+output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_almost_full;
 
 // to indicate to the node about the virtual channel buffers fill status
 input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] adjacent_node_previous_vc_table;
@@ -101,6 +101,8 @@ output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] 
 	//wire [NUM_OF_PORTS*DIRECTION_WIDTH-1:0] out_port_num;
 `endif
 
+//wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_full;
+wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full;
 
 wire [NUM_OF_PORTS-1:0] valid_output;
 reg [NUM_OF_PORTS-1:0] valid_output_previously;
@@ -346,7 +348,7 @@ generate
 				flit_data_input[port_num][(FLIT_TOTAL_WIDTH-HEAD_TAIL-1) -: VIRTUAL_CHANNELS_BITWIDTH] ;
 
 
-		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_vc_are_reserved_and_not_full;
+		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_vc_are_reserved_and_not_almost_full;
 
 		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] granted_vc_enqueue; // to indicate which vc to reserve
 
@@ -398,18 +400,18 @@ generate
 					// backpressure mechanism for subsequent flits
 					(((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
 					  (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
-					  (|adjacent_nodes_vc_are_reserved_and_not_full)))
+					  (|adjacent_nodes_vc_are_reserved_and_not_almost_full)))
 					  
 					&& (!requests_from_multiple_ports ||
 						requests_from_multiple_ports &&
 					 	requests_in_ports_have_been_served[port_num]));
 
 
-			assign adjacent_nodes_vc_are_reserved_and_not_full[vc_num] = 
+			assign adjacent_nodes_vc_are_reserved_and_not_almost_full[vc_num] = 
 				//(direction[port_num] == STOP) ? 1'b0 :					
 
 			  ((!adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]) 
-			  & (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
+			  & (!adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
 
 
 			always @(posedge clk)
@@ -537,6 +539,7 @@ generate
 			(
 				.clk(clk), .reset(reset),
 				.full(current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]), 
+				.almost_full(current_node_vc_are_almost_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]), 
 				.enqueue_en(enqueue_en), 
 				.enqueue_value(data_input_to_vc[port_num][vc_num]),
 
@@ -1016,18 +1019,23 @@ generate
 
 		assign valid_output[port_num] = (reset) ? 
 
-				(direction[port_num] == port_num) &&
-				((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
-				
-				(direction[port_num] == port_num) &&
-				
-				(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
-				 (valid_output_previously[port_num] && 
-				 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT))) &&
-				 
-				 // backpressure mechanism
-				(~adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + matching_vc_number]);
+			(direction[port_num] == port_num) &&
+			((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
+			
+			(direction[port_num] == port_num) &&
+			
+			(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
+			 (valid_output_previously[port_num] && 
+			 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT))) &&
+			 
+			 // backpressure mechanism , needs to have 1 clock cycle in advance to prevent buffer overloading
+			(~adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS+matching_vc_number]);
 
+		`ifdef FORMAL
+		
+		(* keep *) wire [$clog2(NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS)-1:0] debug_signal_1 =
+								direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + matching_vc_number;
+		`endif
 
 		initial flit_data_output[port_num] = 0;
 

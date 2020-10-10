@@ -64,8 +64,8 @@ wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_is_ready [NUM_OF_NO
 wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_are_ready [NUM_OF_NODES-1:0];
 
 // to control the flow, acts as traffic light for the data flits
-wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full[NUM_OF_NODES-1:0];
-wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_full[NUM_OF_NODES-1:0];
+wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_almost_full[NUM_OF_NODES-1:0];
+wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_almost_full[NUM_OF_NODES-1:0];
 
 // to control the flow, acts as traffic light for the data flits
 wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] 
@@ -129,9 +129,9 @@ generate
 			assign flit_data_input_are_valid[node_num][ANTI_CLOCKWISE] = 
 				   flit_data_output_are_valid[NUM_OF_NODES-1][CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			assign adjacent_node_vc_are_almost_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 			 											NUM_OF_VIRTUAL_CHANNELS] = 
-				   current_node_vc_are_full[NUM_OF_NODES-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				   current_node_vc_are_almost_full[NUM_OF_NODES-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 				    										NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
@@ -153,9 +153,9 @@ generate
 			assign flit_data_input_are_valid[node_num][ANTI_CLOCKWISE] = 
 				   flit_data_output_are_valid[node_num-1][CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			assign adjacent_node_vc_are_almost_full[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 			 											NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				   current_node_vc_are_almost_full[node_num-1][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 				    									NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
@@ -179,9 +179,9 @@ generate
 			assign flit_data_input_are_valid[node_num][CLOCKWISE] = 
 				   flit_data_output_are_valid[0][ANTI_CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			assign adjacent_node_vc_are_almost_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 			 											NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[0][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
+				   current_node_vc_are_almost_full[0][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 			 											NUM_OF_VIRTUAL_CHANNELS] =
@@ -201,9 +201,9 @@ generate
 			assign flit_data_input_are_valid[node_num][CLOCKWISE] = 
 				   flit_data_output_are_valid[node_num+1][ANTI_CLOCKWISE];
 
-			assign adjacent_node_vc_are_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+			assign adjacent_node_vc_are_almost_full[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 			 											NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num+1][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
+				   current_node_vc_are_almost_full[node_num+1][ANTI_CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
 				    									NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][CLOCKWISE*NUM_OF_VIRTUAL_CHANNELS +:
@@ -227,8 +227,8 @@ generate
 			assign flit_data_input_are_valid[node_num][ACROSS] = 
 				   flit_data_output_are_valid[node_num-(NUM_OF_NODES>>1)][ACROSS];
 
-			assign adjacent_node_vc_are_full[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num-(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
+			assign adjacent_node_vc_are_almost_full[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_vc_are_almost_full[node_num-(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
 				    													NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
@@ -249,8 +249,8 @@ generate
 			assign flit_data_input_are_valid[node_num][ACROSS] = 
 				   flit_data_output_are_valid[node_num+(NUM_OF_NODES>>1)][ACROSS];
 
-			assign adjacent_node_vc_are_full[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
-				   current_node_vc_are_full[node_num+(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
+			assign adjacent_node_vc_are_almost_full[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
+				   current_node_vc_are_almost_full[node_num+(NUM_OF_NODES>>1)][ACROSS*NUM_OF_VIRTUAL_CHANNELS +:
 				    													NUM_OF_VIRTUAL_CHANNELS];
 
 			assign adjacent_nodes_are_ready[node_num][ACROSS*NUM_OF_VIRTUAL_CHANNELS +: NUM_OF_VIRTUAL_CHANNELS] =
@@ -313,8 +313,8 @@ generate
 			.adjacent_nodes_are_ready(adjacent_nodes_are_ready[node_num]),
 
 			// backpressure signals
-			.current_node_vc_are_full(current_node_vc_are_full[node_num]),  // output
-			.adjacent_node_vc_are_full(adjacent_node_vc_are_full[node_num]), // input
+			.current_node_vc_are_almost_full(current_node_vc_are_almost_full[node_num]),  // output
+			.adjacent_node_vc_are_almost_full(adjacent_node_vc_are_almost_full[node_num]), // input
 			
 			// signals that track previous virtual channels for wormhole switching purpose
 			.current_node_previous_vc_table(current_node_previous_vc_table[node_num]),  // output

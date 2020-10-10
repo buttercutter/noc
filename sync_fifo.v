@@ -37,15 +37,15 @@
 
 module sync_fifo
     #(parameter WIDTH = 4, // please use very large value of WIDTH to test for 'keep_running' == 1
-    parameter SIZE = 2
-    //parameter ALMOST_FULL_THRESHOLD = SIZE,
+    parameter SIZE = 2,
+    parameter ALMOST_FULL_THRESHOLD = SIZE-1
     //parameter ALMOST_EMPTY_THRESHOLD = 1
 	)
 
     (input                       clk,
     input                        reset,
     output		                 full,
-    //output reg                 almost_full,
+    output reg    	             almost_full,
     input                        enqueue_en,
     input [WIDTH - 1:0]          enqueue_value,
     output		                 empty,
@@ -82,7 +82,7 @@ module sync_fifo
 
 	reg [ADDR_WIDTH:0] count = 0;
 
-    //assign almost_full = count >= (ADDR_WIDTH + 1)'(ALMOST_FULL_THRESHOLD);
+    assign almost_full = count >= (ADDR_WIDTH + 1)'(ALMOST_FULL_THRESHOLD);
     //assign almost_empty = count <= (ADDR_WIDTH + 1)'(ALMOST_EMPTY_THRESHOLD);
 
     assign full = (count == SIZE[ADDR_WIDTH:0]);
