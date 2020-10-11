@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Oct 10 08:03:13 2020
+[*] Sun Oct 11 08:10:10 2020
 [*]
 [dumpfile] "/home/phung/Downloads/noc/spidergon_proof/engine_0/trace.vcd"
-[dumpfile_mtime] "Sat Oct 10 07:52:46 2020"
-[dumpfile_size] 712524
+[dumpfile_mtime] "Sun Oct 11 08:00:57 2020"
+[dumpfile_size] 647391
 [savefile] "/home/phung/Downloads/noc/spidergon_bmc.gtkw"
 [timestart] 0
 [size] 1920 995
@@ -20,7 +20,6 @@ smt_clock
 smt_step
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -75,7 +74,6 @@ spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<0>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -191,7 +189,6 @@ spidergon_top.NODES<0>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -246,7 +243,6 @@ spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<0>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -357,7 +353,6 @@ spidergon_top.NODES<0>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -412,7 +407,6 @@ spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<0>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -563,6 +557,12 @@ spidergon_top.NODES<0>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<0>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<0>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<0>.SPnode.direction<2>[1:0]
+spidergon_top.NODES<0>.SPnode.enqueue_en<0>
+spidergon_top.NODES<0>.SPnode.enqueue_en<1>
+spidergon_top.NODES<0>.SPnode.enqueue_en<2>
+spidergon_top.NODES<0>.SPnode.enqueue_en<3>
+spidergon_top.NODES<0>.SPnode.enqueue_en<4>
+spidergon_top.NODES<0>.SPnode.enqueue_en<5>
 spidergon_top.NODES<0>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<0>.SPnode.flit_data_input<0>[18:0]
@@ -701,7 +701,6 @@ spidergon_top.NODES<0>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 spidergon_top.NODES<0>.dest_ports[31:0]
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -756,7 +755,6 @@ spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<1>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -872,7 +870,6 @@ spidergon_top.NODES<1>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -927,7 +924,6 @@ spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<1>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -1038,7 +1034,6 @@ spidergon_top.NODES<1>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -1093,7 +1088,6 @@ spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<1>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -1244,6 +1238,12 @@ spidergon_top.NODES<1>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<1>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<1>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<1>.SPnode.direction<2>[1:0]
+spidergon_top.NODES<1>.SPnode.enqueue_en<0>
+spidergon_top.NODES<1>.SPnode.enqueue_en<1>
+spidergon_top.NODES<1>.SPnode.enqueue_en<2>
+spidergon_top.NODES<1>.SPnode.enqueue_en<3>
+spidergon_top.NODES<1>.SPnode.enqueue_en<4>
+spidergon_top.NODES<1>.SPnode.enqueue_en<5>
 spidergon_top.NODES<1>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<1>.SPnode.flit_data_input<0>[18:0]
@@ -1382,7 +1382,6 @@ spidergon_top.NODES<1>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 spidergon_top.NODES<1>.dest_ports[31:0]
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -1437,7 +1436,6 @@ spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<2>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -1553,7 +1551,6 @@ spidergon_top.NODES<2>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -1608,7 +1605,6 @@ spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<2>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -1719,7 +1715,6 @@ spidergon_top.NODES<2>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -1774,7 +1769,6 @@ spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<2>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -1925,6 +1919,12 @@ spidergon_top.NODES<2>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<2>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<2>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<2>.SPnode.direction<2>[1:0]
+spidergon_top.NODES<2>.SPnode.enqueue_en<0>
+spidergon_top.NODES<2>.SPnode.enqueue_en<1>
+spidergon_top.NODES<2>.SPnode.enqueue_en<2>
+spidergon_top.NODES<2>.SPnode.enqueue_en<3>
+spidergon_top.NODES<2>.SPnode.enqueue_en<4>
+spidergon_top.NODES<2>.SPnode.enqueue_en<5>
 spidergon_top.NODES<2>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<2>.SPnode.flit_data_input<0>[18:0]
@@ -2063,7 +2063,6 @@ spidergon_top.NODES<2>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 spidergon_top.NODES<2>.dest_ports[31:0]
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -2118,7 +2117,6 @@ spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<3>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -2234,7 +2232,6 @@ spidergon_top.NODES<3>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -2289,7 +2286,6 @@ spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<3>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -2400,7 +2396,6 @@ spidergon_top.NODES<3>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -2455,7 +2450,6 @@ spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<3>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -2606,6 +2600,12 @@ spidergon_top.NODES<3>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<3>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<3>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<3>.SPnode.direction<2>[1:0]
+spidergon_top.NODES<3>.SPnode.enqueue_en<0>
+spidergon_top.NODES<3>.SPnode.enqueue_en<1>
+spidergon_top.NODES<3>.SPnode.enqueue_en<2>
+spidergon_top.NODES<3>.SPnode.enqueue_en<3>
+spidergon_top.NODES<3>.SPnode.enqueue_en<4>
+spidergon_top.NODES<3>.SPnode.enqueue_en<5>
 spidergon_top.NODES<3>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<3>.SPnode.flit_data_input<0>[18:0]
@@ -2744,7 +2744,6 @@ spidergon_top.NODES<3>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 spidergon_top.NODES<3>.dest_ports[31:0]
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -2799,7 +2798,6 @@ spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<4>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -2915,7 +2913,6 @@ spidergon_top.NODES<4>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -2970,7 +2967,6 @@ spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<4>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -3081,7 +3077,6 @@ spidergon_top.NODES<4>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -3136,7 +3131,6 @@ spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<4>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -3287,6 +3281,14 @@ spidergon_top.NODES<4>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<4>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<4>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<4>.SPnode.direction<2>[1:0]
+@29
+spidergon_top.NODES<4>.SPnode.enqueue_en<0>
+@28
+spidergon_top.NODES<4>.SPnode.enqueue_en<1>
+spidergon_top.NODES<4>.SPnode.enqueue_en<2>
+spidergon_top.NODES<4>.SPnode.enqueue_en<3>
+spidergon_top.NODES<4>.SPnode.enqueue_en<4>
+spidergon_top.NODES<4>.SPnode.enqueue_en<5>
 spidergon_top.NODES<4>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<4>.SPnode.flit_data_input<0>[18:0]
@@ -3294,7 +3296,7 @@ spidergon_top.NODES<4>.SPnode.flit_data_input<1>[18:0]
 spidergon_top.NODES<4>.SPnode.flit_data_input<2>[18:0]
 spidergon_top.NODES<4>.SPnode.flit_data_input_across[18:0]
 spidergon_top.NODES<4>.SPnode.flit_data_input_anticlockwise[18:0]
-@28
+@29
 spidergon_top.NODES<4>.SPnode.flit_data_input_are_valid[2:0]
 @22
 spidergon_top.NODES<4>.SPnode.flit_data_input_clockwise[18:0]
@@ -3345,8 +3347,9 @@ spidergon_top.NODES<4>.SPnode.port_index.index[1:0]
 spidergon_top.NODES<4>.SPnode.port_index.oh_index[31:0]
 @28
 spidergon_top.NODES<4>.SPnode.port_index.one_hot[2:0]
-@22
+@23
 spidergon_top.NODES<4>.SPnode.previous_data_input_to_vc<0>[18:0]
+@22
 spidergon_top.NODES<4>.SPnode.previous_data_input_to_vc<1>[18:0]
 spidergon_top.NODES<4>.SPnode.previous_data_input_to_vc<2>[18:0]
 spidergon_top.NODES<4>.SPnode.previous_data_input_to_vc<3>[18:0]
@@ -3386,8 +3389,9 @@ spidergon_top.NODES<4>.SPnode.rr_arb_port_to_cpu.req[2:0]
 spidergon_top.NODES<4>.SPnode.rr_arb_port_to_cpu.req_previous[2:0]
 spidergon_top.NODES<4>.SPnode.rr_arb_port_to_cpu.reset
 spidergon_top.NODES<4>.SPnode.second_clock_had_passed
-@22
+@23
 spidergon_top.NODES<4>.SPnode.sum_data<0>[9:0]
+@22
 spidergon_top.NODES<4>.SPnode.sum_data<1>[9:0]
 spidergon_top.NODES<4>.SPnode.sum_data<2>[9:0]
 spidergon_top.NODES<4>.SPnode.sum_data<3>[9:0]
@@ -3425,7 +3429,6 @@ spidergon_top.NODES<4>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 spidergon_top.NODES<4>.dest_ports[31:0]
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -3480,7 +3483,6 @@ spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<5>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -3596,7 +3598,6 @@ spidergon_top.NODES<5>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -3651,7 +3652,6 @@ spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<5>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -3762,7 +3762,6 @@ spidergon_top.NODES<5>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -3817,7 +3816,6 @@ spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<5>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -3968,6 +3966,12 @@ spidergon_top.NODES<5>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<5>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<5>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<5>.SPnode.direction<2>[1:0]
+spidergon_top.NODES<5>.SPnode.enqueue_en<0>
+spidergon_top.NODES<5>.SPnode.enqueue_en<1>
+spidergon_top.NODES<5>.SPnode.enqueue_en<2>
+spidergon_top.NODES<5>.SPnode.enqueue_en<3>
+spidergon_top.NODES<5>.SPnode.enqueue_en<4>
+spidergon_top.NODES<5>.SPnode.enqueue_en<5>
 spidergon_top.NODES<5>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<5>.SPnode.flit_data_input<0>[18:0]
@@ -4106,7 +4110,6 @@ spidergon_top.NODES<5>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 spidergon_top.NODES<5>.dest_ports[31:0]
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -4161,7 +4164,6 @@ spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<6>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -4277,7 +4279,6 @@ spidergon_top.NODES<6>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -4332,7 +4333,6 @@ spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<6>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -4443,7 +4443,6 @@ spidergon_top.NODES<6>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -4498,7 +4497,6 @@ spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<6>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -4649,6 +4647,12 @@ spidergon_top.NODES<6>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<6>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<6>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<6>.SPnode.direction<2>[1:0]
+spidergon_top.NODES<6>.SPnode.enqueue_en<0>
+spidergon_top.NODES<6>.SPnode.enqueue_en<1>
+spidergon_top.NODES<6>.SPnode.enqueue_en<2>
+spidergon_top.NODES<6>.SPnode.enqueue_en<3>
+spidergon_top.NODES<6>.SPnode.enqueue_en<4>
+spidergon_top.NODES<6>.SPnode.enqueue_en<5>
 spidergon_top.NODES<6>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<6>.SPnode.flit_data_input<0>[18:0]
@@ -4787,7 +4791,6 @@ spidergon_top.NODES<6>.SPnode.vc_is_to_be_deallocated_previously<2>[1:0]
 spidergon_top.NODES<6>.dest_ports[31:0]
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -4842,7 +4845,6 @@ spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<7>.SPnode.PORTS<0>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -4958,7 +4960,6 @@ spidergon_top.NODES<7>.SPnode.PORTS<0>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<0>.vc_index.one_hot[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -5013,7 +5014,6 @@ spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<7>.SPnode.PORTS<1>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -5124,7 +5124,6 @@ spidergon_top.NODES<7>.SPnode.PORTS<1>.vc_index.oh_index[31:0]
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<1>.vc_index.one_hot[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.dequeue_en
-spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.enqueue_en
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.addr_diff[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.fifo.address_rollover_had_occured_previously
@@ -5179,7 +5178,6 @@ spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.oh_index[3
 @28
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<0>.port_index.one_hot[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.dequeue_en
-spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.enqueue_en
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.addr_diff[1:0]
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured
 spidergon_top.NODES<7>.SPnode.PORTS<2>.VIRTUAL_CHANNELS<1>.fifo.address_rollover_had_occured_previously
@@ -5330,6 +5328,12 @@ spidergon_top.NODES<7>.SPnode.dest_node_for_sending_node_own_data<2>[2:0]
 spidergon_top.NODES<7>.SPnode.direction<0>[1:0]
 spidergon_top.NODES<7>.SPnode.direction<1>[1:0]
 spidergon_top.NODES<7>.SPnode.direction<2>[1:0]
+spidergon_top.NODES<7>.SPnode.enqueue_en<0>
+spidergon_top.NODES<7>.SPnode.enqueue_en<1>
+spidergon_top.NODES<7>.SPnode.enqueue_en<2>
+spidergon_top.NODES<7>.SPnode.enqueue_en<3>
+spidergon_top.NODES<7>.SPnode.enqueue_en<4>
+spidergon_top.NODES<7>.SPnode.enqueue_en<5>
 spidergon_top.NODES<7>.SPnode.first_clock_had_passed
 @22
 spidergon_top.NODES<7>.SPnode.flit_data_input<0>[18:0]

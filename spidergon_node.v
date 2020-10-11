@@ -291,6 +291,8 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 reg [VIRTUAL_CHANNELS_BITWIDTH:0] previous_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0];	
 
+wire enqueue_en [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
+
 
 genvar port_num;
 genvar vc_num;
@@ -433,7 +435,7 @@ generate
 			// ((vc is available for head_flit or header flit only) || 
 			// ('vc is reserved' by the same 'head flit')) && '!current vc is full'
 
-			wire enqueue_en = (!reset & reset_previously) ? 
+			assign enqueue_en[port_num][vc_num] = (!reset & reset_previously) ? 
 				flit_data_input_are_valid[port_num] && (vc_num == 0) :
 
 				flit_data_input_are_valid[port_num] &&
@@ -470,12 +472,12 @@ generate
 				   
 					vc_is_allocated_by_head_flit[port_num][vc_num] <= 0;
 				
-				else if(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))
+				else if(enqueue_en[port_num][vc_num] && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))
 					vc_is_allocated_by_head_flit[port_num][vc_num] <= 1;
 			end
 
 			always @(posedge clk) 
-				cover(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER) &&
+				cover(enqueue_en[port_num][vc_num] && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER) &&
 				 		vc_is_allocated_by_head_flit[port_num][vc_num]);
 			
 			always @(posedge clk)
@@ -484,7 +486,7 @@ generate
 				   vc_is_to_be_deallocated[port_num][vc_num]) // tail flit was here previously
 						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
-				else if(enqueue_en && 
+				else if(enqueue_en[port_num][vc_num] && 
 				        ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT) ||  
 						 vc_is_allocated_by_head_flit[port_num][vc_num]))
 					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
@@ -498,7 +500,7 @@ generate
 					if($past(reset) || $past(vc_is_to_be_deallocated[port_num][vc_num]))
 						assert(sum_data[port_num][vc_num] == 0);
 
-					else if($past(enqueue_en) && 
+					else if($past(enqueue_en[port_num][vc_num]) && 
 						   (($past(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL]) == HEAD_FLIT) ||
 							 vc_is_allocated_by_head_flit_previously[port_num][vc_num]))
 						
@@ -520,13 +522,38 @@ generate
 
 			always @(posedge clk)
 			begin
-				if(first_clock_had_passed && (!$past(reset)) &&
-				   (previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)
-				 && ($past(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL]) == 
-				 	 BODY_FLIT))
-				 	 
-					assert(sum_data[port_num][vc_num] == 
-							previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+				if(first_clock_had_passed)
+				begin
+					if($past(reset)) assert(sum_data[port_num][vc_num] == 0);
+				
+					else if($past(flit_data_input_are_valid[port_num]) &&
+					    $past(enqueue_en[port_num][vc_num]))
+					begin
+						if((previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: 
+							HEAD_TAIL] == TAIL_FLIT) && 
+							($past(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -:
+						    HEAD_TAIL]) == BODY_FLIT)) // tail flit 
+					    
+							assert(sum_data[port_num][vc_num] == 
+								previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+								
+								
+						else if(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -:
+					    		HEAD_TAIL] == HEAD_FLIT) // head flit 
+					    
+							assert(sum_data[port_num][vc_num] == 
+								previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+								
+								
+						else if(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -:
+					    		HEAD_TAIL] == BODY_FLIT) // body flit 
+					    
+							assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]) +
+								previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+					end
+					
+					else assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]));
+				end
 			end
 			
 			`endif
@@ -542,7 +569,7 @@ generate
 				.clk(clk), .reset(reset),
 				.full(current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]), 
 				.almost_full(current_node_vc_are_almost_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]), 
-				.enqueue_en(enqueue_en), 
+				.enqueue_en(enqueue_en[port_num][vc_num]), 
 				.enqueue_value(data_input_to_vc[port_num][vc_num]),
 
 				// buffer could be empty even it is reserved, due to flits not arriving yet
@@ -585,7 +612,7 @@ generate
 			assign vc_is_to_be_deallocated[port_num][vc_num] = 
 					(req_previous[port_num][vc_num] && flit_data_input_are_valid[port_num] &&
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
-					(enqueue_en) && // still needs to enqueue 1 last flit (tail flit) into vc before deallocation
+					(enqueue_en[port_num][vc_num]) && // still needs to enqueue 1 last flit (tail flit) into vc before deallocation
 					({1'b0, prev_vc} == previous_vc[port_num][vc_num])) &&
 					(requests_in_ports_have_been_served[port_num]);
 
