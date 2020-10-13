@@ -442,7 +442,9 @@ generate
 				((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num] && 
 				 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEADER) ||
 				  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))) ||
-				(!vc_is_available[port_num][vc_num] && ({1'b0, prev_vc} == previous_vc[port_num][vc_num]))) &&
+				(!vc_is_available[port_num][vc_num] && ({1'b0, prev_vc} == previous_vc[port_num][vc_num]) &&
+ 				 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == BODY_FLIT) ||
+				  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT)))) &&
 
 				(!current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]);
 
