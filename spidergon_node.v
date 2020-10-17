@@ -151,6 +151,10 @@ wire [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_allocated [NUM_OF_PORTS-1:0];
 wire [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated [NUM_OF_PORTS-1:0];
 
 `ifdef FORMAL
+
+// for deadlock check purpose
+reg [$clog2(NUM_OF_NODES)-1:0] vc_reserved_time [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0]; 
+
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_allocated_previously [NUM_OF_PORTS-1:0];
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated_previously [NUM_OF_PORTS-1:0];
 
@@ -702,6 +706,23 @@ generate
 					end
 				end
 			end
+
+
+			// virtual channels are not supposed to be reserved for too long,
+			// otherwise this could be a precursor of deadlock
+			// the duration in which the virtual channels are reserved mostly depends on 
+			// the total number of nodes inside the spidergon NoC
+			
+			always @(posedge clk)
+			begin
+				if(reset || (!req[port_num][vc_num])) vc_reserved_time[port_num][vc_num] <= 0;
+				
+				else if(req[port_num][vc_num]) 
+					vc_reserved_time[port_num][vc_num] <= vc_reserved_time[port_num][vc_num] + 1;
+			end
+			
+			always @(posedge clk) assert(vc_reserved_time[port_num][vc_num] < NUM_OF_NODES);
+
 
 			//always @(posedge clk)  cover((vc_num == vc_new) || (vc_num == vc_old));
 
