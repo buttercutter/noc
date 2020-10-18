@@ -22,7 +22,7 @@ read_verilog -formal spidergon_top.v
 read_verilog -formal spidergon_node.v
 read_verilog -formal router.v
 read_verilog -formal arbiter.v
-read_verilog -formal sync_fifo.v
+read_verilog -formal -sv sync_fifo.v
 read_verilog -formal oh_to_idx.v
 
 prep -top spidergon_top

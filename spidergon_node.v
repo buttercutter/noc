@@ -26,7 +26,7 @@ module spidergon_node
 	node_data_from_cpu, node_data_to_cpu, data_input,
 	flit_data_input_are_valid, flit_data_output_are_valid,
 	current_node_is_ready, adjacent_nodes_are_ready,
-	current_node_vc_are_full, adjacent_node_vc_are_full,
+	current_node_vc_are_almost_full, adjacent_node_vc_are_almost_full,
 	current_node_previous_vc_table, adjacent_node_previous_vc_table
 );
 
@@ -84,8 +84,8 @@ input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_are_ready;
 output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_is_ready;
 
 // to indicate to the node about the virtual channel buffers fill status
-input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_full;
-output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full;
+input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_almost_full;
+output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_almost_full;
 
 // to indicate to the node about the virtual channel buffers fill status
 input [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] adjacent_node_previous_vc_table;
@@ -101,6 +101,8 @@ output [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS*(VIRTUAL_CHANNELS_BITWIDTH+1)-1:0] 
 	//wire [NUM_OF_PORTS*DIRECTION_WIDTH-1:0] out_port_num;
 `endif
 
+//wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_node_vc_are_full;
+wire [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0] current_node_vc_are_full;
 
 wire [NUM_OF_PORTS-1:0] valid_output;
 reg [NUM_OF_PORTS-1:0] valid_output_previously;
@@ -149,6 +151,10 @@ wire [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_allocated [NUM_OF_PORTS-1:0];
 wire [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated [NUM_OF_PORTS-1:0];
 
 `ifdef FORMAL
+
+// for deadlock check purpose
+reg [$clog2(NUM_OF_NODES)-1:0] vc_reserved_time [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0]; 
+
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_allocated_previously [NUM_OF_PORTS-1:0];
 reg [NUM_OF_VIRTUAL_CHANNELS-1:0] vc_is_to_be_deallocated_previously [NUM_OF_PORTS-1:0];
 
@@ -287,7 +293,10 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 */
 
 reg [VIRTUAL_CHANNELS_BITWIDTH:0] previous_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
-		
+wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0];	
+
+wire enqueue_en [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
+
 
 genvar port_num;
 genvar vc_num;
@@ -346,7 +355,7 @@ generate
 				flit_data_input[port_num][(FLIT_TOTAL_WIDTH-HEAD_TAIL-1) -: VIRTUAL_CHANNELS_BITWIDTH] ;
 
 
-		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_vc_are_reserved_and_not_full;
+		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] adjacent_nodes_vc_are_reserved_and_not_almost_full;
 
 		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] granted_vc_enqueue; // to indicate which vc to reserve
 
@@ -389,27 +398,28 @@ generate
 			wire dequeue_en = ((direction[port_num] == STOP) || (node_needs_to_send_its_own_data[port_num])) ?
 			 					1'b0 :
 			
-					// backpressure mechanism for first flit
-				  (((((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
-				      (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
-				      (|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
-							NUM_OF_VIRTUAL_CHANNELS])) || 
-						
-					// backpressure mechanism for subsequent flits
-					(((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
-					  (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
-					  (|adjacent_nodes_vc_are_reserved_and_not_full)))
-					  
-					&& (!requests_from_multiple_ports ||
-						requests_from_multiple_ports &&
-					 	requests_in_ports_have_been_served[port_num]));
+				// backpressure mechanism for first flit
+			  (((((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
+			      (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
+			      (|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
+						NUM_OF_VIRTUAL_CHANNELS])) || 
+					
+				// backpressure mechanism for subsequent flits
+				(((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
+				  (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
+				 (adjacent_nodes_vc_are_reserved_and_not_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS 
+				  + matching_vc_number[vc_num]])))
+				  
+				&& (!requests_from_multiple_ports ||
+					requests_from_multiple_ports &&
+				 	requests_in_ports_have_been_served[port_num]));
 
 
-			assign adjacent_nodes_vc_are_reserved_and_not_full[vc_num] = 
+			assign adjacent_nodes_vc_are_reserved_and_not_almost_full[vc_num] = 
 				//(direction[port_num] == STOP) ? 1'b0 :					
 
 			  ((!adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]) 
-			  & (!adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
+			  & (!adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + vc_num]));
 
 
 			always @(posedge clk)
@@ -429,14 +439,16 @@ generate
 			// ((vc is available for head_flit or header flit only) || 
 			// ('vc is reserved' by the same 'head flit')) && '!current vc is full'
 
-			wire enqueue_en = (!reset & reset_previously) ? 
+			assign enqueue_en[port_num][vc_num] = (!reset & reset_previously) ? 
 				flit_data_input_are_valid[port_num] && (vc_num == 0) :
 
 				flit_data_input_are_valid[port_num] &&
 				((vc_is_available[port_num][vc_num] && granted_vc_enqueue[vc_num] && 
 				 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEADER) ||
 				  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))) ||
-				(!vc_is_available[port_num][vc_num] && ({1'b0, prev_vc} == previous_vc[port_num][vc_num]))) &&
+				(!vc_is_available[port_num][vc_num] && ({1'b0, prev_vc} == previous_vc[port_num][vc_num]) &&
+ 				 ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == BODY_FLIT) ||
+				  (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT)))) &&
 
 				(!current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]);
 
@@ -466,12 +478,12 @@ generate
 				   
 					vc_is_allocated_by_head_flit[port_num][vc_num] <= 0;
 				
-				else if(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))
+				else if(enqueue_en[port_num][vc_num] && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT))
 					vc_is_allocated_by_head_flit[port_num][vc_num] <= 1;
 			end
 
 			always @(posedge clk) 
-				cover(enqueue_en && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER) &&
+				cover(enqueue_en[port_num][vc_num] && (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] != HEADER) &&
 				 		vc_is_allocated_by_head_flit[port_num][vc_num]);
 			
 			always @(posedge clk)
@@ -480,7 +492,7 @@ generate
 				   vc_is_to_be_deallocated[port_num][vc_num]) // tail flit was here previously
 						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
-				else if(enqueue_en && 
+				else if(enqueue_en[port_num][vc_num] && 
 				        ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT) ||  
 						 vc_is_allocated_by_head_flit[port_num][vc_num]))
 					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
@@ -494,7 +506,7 @@ generate
 					if($past(reset) || $past(vc_is_to_be_deallocated[port_num][vc_num]))
 						assert(sum_data[port_num][vc_num] == 0);
 
-					else if($past(enqueue_en) && 
+					else if($past(enqueue_en[port_num][vc_num]) && 
 						   (($past(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL]) == HEAD_FLIT) ||
 							 vc_is_allocated_by_head_flit_previously[port_num][vc_num]))
 						
@@ -516,13 +528,38 @@ generate
 
 			always @(posedge clk)
 			begin
-				if(first_clock_had_passed && (!$past(reset)) &&
-				   (previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)
-				 && ($past(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL]) == 
-				 	 BODY_FLIT))
-				 	 
-					assert(sum_data[port_num][vc_num] == 
-							previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+				if(first_clock_had_passed)
+				begin
+					if($past(reset)) assert(sum_data[port_num][vc_num] == 0);
+				
+					else if($past(flit_data_input_are_valid[port_num]) &&
+					    $past(enqueue_en[port_num][vc_num]))
+					begin
+						if((previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: 
+							HEAD_TAIL] == TAIL_FLIT) && 
+							($past(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -:
+						    HEAD_TAIL]) == BODY_FLIT)) // tail flit 
+					    
+							assert(sum_data[port_num][vc_num] == 
+								previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+								
+								
+						else if(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -:
+					    		HEAD_TAIL] == HEAD_FLIT) // head flit 
+					    
+							assert(sum_data[port_num][vc_num] == 
+								previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+								
+								
+						else if(previous_data_input_to_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -:
+					    		HEAD_TAIL] == BODY_FLIT) // body flit 
+					    
+							assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]) +
+								previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+					end
+					
+					else assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]));
+				end
 			end
 			
 			`endif
@@ -537,7 +574,8 @@ generate
 			(
 				.clk(clk), .reset(reset),
 				.full(current_node_vc_are_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]), 
-				.enqueue_en(enqueue_en), 
+				.almost_full(current_node_vc_are_almost_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num]), 
+				.enqueue_en(enqueue_en[port_num][vc_num]), 
 				.enqueue_value(data_input_to_vc[port_num][vc_num]),
 
 				// buffer could be empty even it is reserved, due to flits not arriving yet
@@ -580,7 +618,7 @@ generate
 			assign vc_is_to_be_deallocated[port_num][vc_num] = 
 					(req_previous[port_num][vc_num] && flit_data_input_are_valid[port_num] &&
 					(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == TAIL_FLIT) &&
-					(enqueue_en) && // still needs to enqueue 1 last flit (tail flit) into vc before deallocation
+					(enqueue_en[port_num][vc_num]) && // still needs to enqueue 1 last flit (tail flit) into vc before deallocation
 					({1'b0, prev_vc} == previous_vc[port_num][vc_num])) &&
 					(requests_in_ports_have_been_served[port_num]);
 
@@ -669,6 +707,23 @@ generate
 				end
 			end
 
+
+			// virtual channels are not supposed to be reserved for too long,
+			// otherwise this could be a precursor of deadlock
+			// the duration in which the virtual channels are reserved mostly depends on 
+			// the total number of nodes inside the spidergon NoC
+			
+			always @(posedge clk)
+			begin
+				if(reset || (!req[port_num][vc_num])) vc_reserved_time[port_num][vc_num] <= 0;
+				
+				else if(req[port_num][vc_num]) 
+					vc_reserved_time[port_num][vc_num] <= vc_reserved_time[port_num][vc_num] + 1;
+			end
+			
+			always @(posedge clk) assert(vc_reserved_time[port_num][vc_num] < NUM_OF_NODES);
+
+
 			//always @(posedge clk)  cover((vc_num == vc_new) || (vc_num == vc_old));
 
 			always @(posedge clk) // for checking functionality correctness of vc allocation mechanism
@@ -695,12 +750,12 @@ generate
 												(VIRTUAL_CHANNELS_BITWIDTH+1)) +: (VIRTUAL_CHANNELS_BITWIDTH+1)] 
 				  	== {1'b0, data_output_from_vc[port_num][vc_num][FLIT_DATA_WIDTH +:
 				  	 												VIRTUAL_CHANNELS_BITWIDTH]});
+			
+			// for one-hot encoding to binary encoding conversion
+			oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) port_index
+			 		(.one_hot(matching_vc), .index(matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num]));
+
 		end
-		
-		wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number;
-		
-		// for one-hot encoding to binary encoding conversion
-		oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) port_index (.one_hot(matching_vc), .index(matching_vc_number));
 
 
 		wire [(HEAD_TAIL-1) : 0] output_flit_type = (node_needs_to_send_its_own_data[port_num]) ?
@@ -1016,18 +1071,25 @@ generate
 
 		assign valid_output[port_num] = (reset) ? 
 
-				(direction[port_num] == port_num) &&
-				((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
-				
-				(direction[port_num] == port_num) &&
-				
-				(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
-				 (valid_output_previously[port_num] && 
-				 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT))) &&
-				 
-				 // backpressure mechanism
-				(~adjacent_node_vc_are_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + matching_vc_number]);
+			(direction[port_num] == port_num) &&
+			((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
+			
+			(direction[port_num] == port_num) &&
+			
+			(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
+			 (valid_output_previously[port_num] && 
+			 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT))) &&
+			 
+			 // backpressure mechanism , needs to have 1 clock cycle in advance to prevent buffer overloading
+			(~adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS+
+												matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS]]);
 
+		`ifdef FORMAL
+		
+		(* keep *) wire [$clog2(NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS)-1:0] debug_signal_1 =
+								direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
+											matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS];
+		`endif
 
 		initial flit_data_output[port_num] = 0;
 

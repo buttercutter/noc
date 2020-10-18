@@ -3,7 +3,7 @@ read_verilog spidergon_top.v
 read_verilog spidergon_node.v
 read_verilog router.v
 read_verilog arbiter.v
-read_verilog sync_fifo.v
+read_verilog -sv sync_fifo.v
 read_verilog oh_to_idx.v
 
 synth_ice40 -flatten -top NoC -json spidergon.json
