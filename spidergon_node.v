@@ -188,7 +188,7 @@ wire [$clog2(NUM_OF_PORTS)-1:0] granted_port_index;
 
 // for detecting if all outstanding requests are already served
 wire [NUM_OF_PORTS-1:0] requests_in_ports_have_been_served = req_port & granted_port;
-wire [NUM_OF_PORTS-1:0] outstanding_requests_in_multiple_ports = req_port - granted_port;
+wire [NUM_OF_PORTS-1:0] outstanding_requests_in_multiple_ports = req_port;// - granted_port;
 //wire [NUM_OF_VIRTUAL_CHANNELS-1:0] outstanding_requests_in_multiple_vcs =
 //							 		req[granted_port_index] - granted_vc[granted_port_index];
 
@@ -306,6 +306,11 @@ generate
 	for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 	begin : PORTS	
 
+		// for the purpose of stopping transaction flow when tail_flit is received
+		wire stop_flow = (reset) ?  
+						(data_input[FLIT_DATA_WIDTH +: HEAD_TAIL] == TAIL_FLIT) : 
+						(output_flit_type == TAIL_FLIT);
+						
 
 		// remember that each ports have multiple vc
 		// virtual channel (VC) outgoing buffers round-robin arbitration (maps vc in port to cpu)
@@ -761,12 +766,6 @@ generate
 		wire [(HEAD_TAIL-1) : 0] output_flit_type = (node_needs_to_send_its_own_data[port_num]) ?
 										node_own_data[port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] :
 										node_data_from_cpu[(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL];
-
-
-		// for the purpose of stopping transaction flow when tail_flit is received
-		wire stop_flow = (reset) ?  
-						(data_input[FLIT_DATA_WIDTH +: HEAD_TAIL] == TAIL_FLIT) : 
-						(output_flit_type == TAIL_FLIT);
 
 
 		assign dest_node[port_num] = (!reset & reset_previously) ? 
