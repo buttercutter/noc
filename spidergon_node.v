@@ -306,11 +306,6 @@ generate
 	for(port_num=0; port_num<NUM_OF_PORTS; port_num=port_num+1)
 	begin : PORTS	
 
-		// for the purpose of stopping transaction flow when tail_flit is received
-		wire stop_flow = (reset) ?  
-						(data_input[FLIT_DATA_WIDTH +: HEAD_TAIL] == TAIL_FLIT) : 
-						(output_flit_type == TAIL_FLIT);
-						
 
 		// remember that each ports have multiple vc
 		// virtual channel (VC) outgoing buffers round-robin arbitration (maps vc in port to cpu)
@@ -328,6 +323,7 @@ generate
 			.index(granted_vc_index[port_num])
 		);
 
+		wire stop_flow;
 
 		// path routing computation block for each input ports
 		router #(NUM_OF_NODES) rt 
@@ -766,6 +762,12 @@ generate
 		wire [(HEAD_TAIL-1) : 0] output_flit_type = (node_needs_to_send_its_own_data[port_num]) ?
 										node_own_data[port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] :
 										node_data_from_cpu[(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL];
+
+
+		// for the purpose of stopping transaction flow when tail_flit is received
+		assign stop_flow = (reset) ?  
+						(data_input[FLIT_DATA_WIDTH +: HEAD_TAIL] == TAIL_FLIT) : 
+						(output_flit_type == TAIL_FLIT);
 
 
 		assign dest_node[port_num] = (!reset & reset_previously) ? 
