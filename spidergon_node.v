@@ -4,12 +4,12 @@ module spidergon_node
 #(
 	`ifdef FORMAL	
 		parameter NUM_OF_NODES=8, 
-		parameter FLIT_DATA_WIDTH=8,
-		parameter NODE_BUFFER_WIDTH=16, // a single vc buffer can hold 2 flit at one time
+		parameter FLIT_DATA_WIDTH=10,
+		parameter NODE_BUFFER_WIDTH=2*FLIT_DATA_WIDTH, // a single vc buffer can hold 2 flit at one time
 	`else
 		parameter NUM_OF_NODES=8,
 		parameter FLIT_DATA_WIDTH=16,
-		parameter NODE_BUFFER_WIDTH=32, // a single vc buffer can hold 2 flits at one time
+		parameter NODE_BUFFER_WIDTH=2*FLIT_DATA_WIDTH, // a single vc buffer can hold 2 flits at one time
 	`endif
 
 	parameter NODE_IDENTIFIER=0,  
@@ -131,7 +131,7 @@ always @(posedge clk) third_clock_had_passed <= second_clock_had_passed;
 `endif
 
 // these virtual channel buffers are at input port side
-wire [FLIT_TOTAL_WIDTH-1:0] data_out_from_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
+reg  [FLIT_TOTAL_WIDTH-1:0] data_out_from_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 wire [FLIT_TOTAL_WIDTH-1:0] data_output_from_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 wire [FLIT_TOTAL_WIDTH-1:0] data_input_to_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 
@@ -400,14 +400,14 @@ generate
 			 					1'b0 :
 			
 				// backpressure mechanism for first flit
-			  (((((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
-			      (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
+			  (((((data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEAD_FLIT) || 
+			      (data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == HEADER)) && 
 			      (|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
 						NUM_OF_VIRTUAL_CHANNELS])) || 
 					
 				// backpressure mechanism for subsequent flits
-				(((data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
-				  (data_out_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
+				(((data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
+				  (data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
 				 (adjacent_nodes_vc_are_reserved_and_not_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS 
 				  + matching_vc_number[vc_num]])))
 				  
@@ -587,12 +587,15 @@ generate
 	
 			assign data_input_to_vc[port_num][vc_num] = flit_data_input[port_num];
 	
-			assign data_out_from_vc[port_num][vc_num] = // modify the vc value for wormhole switching purpose
+			always @(posedge clk)
+			begin
+				data_out_from_vc[port_num][vc_num] <= // modify the vc value for wormhole switching purpose
 				{
 					data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL], // no change
 				 	vc_num[VIRTUAL_CHANNELS_BITWIDTH-1:0], // modified for proper vc allocation and de-allocation
 				 	data_output_from_vc[port_num][vc_num][0 +: FLIT_DATA_WIDTH] // no change
 				};
+			end
 
 			assign vc_is_available[port_num][vc_num] = !req[port_num][vc_num];
 
@@ -653,7 +656,7 @@ generate
 						HEAD_FLIT : req[port_num][vc_num] <= 1;
 
 						// header flit_without_data_payload
-						HEADER : req[port_num][vc_num] <= 1;
+						HEADER : req[port_num][vc_num] <= 0;
 
 						default : req[port_num][vc_num] <= 0;
 
@@ -699,7 +702,7 @@ generate
 							HEAD_FLIT : assert(req[port_num][vc_num] == 1);
 
 							// header flit_without_data_payload
-							HEADER : assert(req[port_num][vc_num] == 1);
+							HEADER : assert(req[port_num][vc_num] == 0);
 
 							default : assert(req[port_num][vc_num] == 0);
 

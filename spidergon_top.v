@@ -4,12 +4,12 @@ module spidergon_top
 #(
 	`ifdef FORMAL	
 		parameter NUM_OF_NODES=8, 
-		parameter FLIT_DATA_WIDTH=8,
-		parameter NODE_BUFFER_WIDTH=16, // a single vc buffer can hold 2 flit at one time
+		parameter FLIT_DATA_WIDTH=10,
+		parameter NODE_BUFFER_WIDTH=2*FLIT_DATA_WIDTH, // a single vc buffer can hold 2 flit at one time
 	`else
 		parameter NUM_OF_NODES=8,
 		parameter FLIT_DATA_WIDTH=16,
-		parameter NODE_BUFFER_WIDTH=32, // a single vc buffer can hold 2 flits at one time
+		parameter NODE_BUFFER_WIDTH=2*FLIT_DATA_WIDTH, // a single vc buffer can hold 2 flits at one time
 	`endif
 
 	parameter NUM_OF_VIRTUAL_CHANNELS=2 // 2 vc for each input ports of each node
