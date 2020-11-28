@@ -293,7 +293,7 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 */
 
 reg [VIRTUAL_CHANNELS_BITWIDTH:0] previous_vc [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
-wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number [NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS-1:0];	
+	
 
 wire enqueue_en [NUM_OF_PORTS-1:0][NUM_OF_VIRTUAL_CHANNELS-1:0];
 
@@ -376,6 +376,7 @@ generate
 		`endif
 
 		wire [NUM_OF_VIRTUAL_CHANNELS-1:0] matching_vc;
+		(* keep *) wire [VIRTUAL_CHANNELS_BITWIDTH-1:0] matching_vc_number;
 
 		for(vc_num=0; vc_num<NUM_OF_VIRTUAL_CHANNELS; vc_num=vc_num+1)
 		begin : VIRTUAL_CHANNELS
@@ -409,7 +410,7 @@ generate
 				(((data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == BODY_FLIT) || 
 				  (data_output_from_vc[port_num][vc_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] == TAIL_FLIT)) &&
 				 (adjacent_nodes_vc_are_reserved_and_not_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS 
-				  + matching_vc_number[vc_num]])))
+				  + matching_vc_number])))
 				  
 				&& (!requests_from_multiple_ports ||
 					requests_from_multiple_ports &&
@@ -752,16 +753,26 @@ generate
 		 														
 				(adjacent_node_previous_vc_table[((port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num)*
 												(VIRTUAL_CHANNELS_BITWIDTH+1)) +: (VIRTUAL_CHANNELS_BITWIDTH+1)] 
-				  	== {1'b0, data_output_from_vc[port_num][vc_num][FLIT_DATA_WIDTH +:
+				  	== {1'b0, data_out_from_vc[port_num][vc_num][FLIT_DATA_WIDTH +:
 				  	 												VIRTUAL_CHANNELS_BITWIDTH]});
-			
-			// for one-hot encoding to binary encoding conversion
-			oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) port_index
-			 		(.one_hot(matching_vc), .index(matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num]));
 
 		end
+		
+/*
+		`ifdef FORMAL
+			always @(posedge clk) 
+				if(first_clock_had_passed)
+					// https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+					assert((matching_vc != 0) && ((matching_vc & (matching_vc - 1)) == 0)); 
+					// same as assert($onehot(matching_vc));
+		`endif
+*/
 
-
+		// for one-hot encoding to binary encoding conversion
+		oh_to_idx #(NUM_OF_VIRTUAL_CHANNELS) port_index
+		 		(.one_hot(matching_vc), .index(matching_vc_number));
+			 		
+			 		
 		wire [(HEAD_TAIL-1) : 0] output_flit_type = (node_needs_to_send_its_own_data[port_num]) ?
 										node_own_data[port_num][(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL] :
 										node_data_from_cpu[(FLIT_TOTAL_WIDTH-1) -: HEAD_TAIL];
@@ -1079,20 +1090,25 @@ generate
 			((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) :
 			
 			(direction[port_num] == port_num) &&
-			
-			(((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) ||
-			 (valid_output_previously[port_num] && 
-			 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT))) &&
-			 
+
 			 // backpressure mechanism , needs to have 1 clock cycle in advance to prevent buffer overloading
+			
+			((((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) && 
+			
+			// for head flit or header, it is ok as long as adjacent node has some available vc
+			(|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
+												VIRTUAL_CHANNELS_BITWIDTH])) ||
+			((valid_output_previously[port_num] && 
+			 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT) &&
+			 
 			(~adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS+
-												matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS]]);
+												matching_vc_number]))));
 
 		`ifdef FORMAL
 		
 		(* keep *) wire [$clog2(NUM_OF_PORTS*NUM_OF_VIRTUAL_CHANNELS)-1:0] debug_signal_1 =
 								direction[port_num]*NUM_OF_VIRTUAL_CHANNELS + 
-											matching_vc_number[port_num*NUM_OF_VIRTUAL_CHANNELS];
+											matching_vc_number;
 		`endif
 
 		initial flit_data_output[port_num] = 0;
