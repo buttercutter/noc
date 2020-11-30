@@ -384,9 +384,12 @@ generate
 			// ON/OFF flow control
 			// to indicate whether flit data could come into the node
 
-			// (vc buffer is not reserved)
+			// (vc buffer is not reserved by head flit) &&
+			// (vc buffer is not full due to header flit, 
+			// but needs to have 1 clock cycle in advance to prevent buffer overloading)
 			assign current_node_is_ready[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num] =
-					vc_is_available[port_num][vc_num];
+					vc_is_available[port_num][vc_num] &&
+					~current_node_vc_are_almost_full[port_num*NUM_OF_VIRTUAL_CHANNELS + vc_num];
 
 			assign current_node_previous_vc_table
 			 [((port_num*NUM_OF_VIRTUAL_CHANNELS+vc_num)*(VIRTUAL_CHANNELS_BITWIDTH+1)) +:
@@ -1091,7 +1094,7 @@ generate
 			
 			(direction[port_num] == port_num) &&
 
-			 // backpressure mechanism , needs to have 1 clock cycle in advance to prevent buffer overloading
+			 // backpressure mechanism
 			
 			((((output_flit_type == HEAD_FLIT) || (output_flit_type == HEADER)) && 
 			
@@ -1101,6 +1104,7 @@ generate
 			((valid_output_previously[port_num] && 
 			 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT) &&
 			 
+			 // needs to have 1 clock cycle in advance to prevent buffer overloading
 			(~adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS+
 												matching_vc_number]))));
 
