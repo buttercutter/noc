@@ -494,7 +494,7 @@ generate
 			always @(posedge clk)
 			begin
 				if(reset || 
-				   vc_is_to_be_deallocated[port_num][vc_num]) // tail flit was here previously
+				   vc_is_to_be_deallocated_previously[port_num][vc_num]) // tail flit was here previously
 						sum_data[port_num][vc_num] <= 0; // so VC is to be released
 					
 				else if(enqueue_en[port_num][vc_num] && 
@@ -508,7 +508,7 @@ generate
 			begin
 				if(first_clock_had_passed)
 				begin
-					if($past(reset) || $past(vc_is_to_be_deallocated[port_num][vc_num]))
+					if($past(reset) || $past(vc_is_to_be_deallocated_previously[port_num][vc_num]))
 						assert(sum_data[port_num][vc_num] == 0);
 
 					else if($past(enqueue_en[port_num][vc_num]) && 
