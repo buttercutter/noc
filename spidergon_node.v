@@ -535,7 +535,8 @@ generate
 			begin
 				if(first_clock_had_passed)
 				begin
-					if($past(reset)) assert(sum_data[port_num][vc_num] == 0);
+					if($past(reset) || $past(vc_is_to_be_deallocated_previously[port_num][vc_num]))
+						assert(sum_data[port_num][vc_num] == 0);
 				
 					else if($past(flit_data_input_are_valid[port_num]) &&
 					    $past(enqueue_en[port_num][vc_num]))
