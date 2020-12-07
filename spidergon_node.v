@@ -499,7 +499,7 @@ generate
 					
 				else if(enqueue_en[port_num][vc_num] && 
 				        ((input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == HEAD_FLIT) ||  
-						 vc_is_allocated_by_head_flit[port_num][vc_num]))
+						 (input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL] == BODY_FLIT)))
 					sum_data[port_num][vc_num] <= sum_data[port_num][vc_num] + 
 													flit_data_input[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH];
 			end
@@ -1103,7 +1103,7 @@ generate
 			(|adjacent_nodes_are_ready[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS +:
 												VIRTUAL_CHANNELS_BITWIDTH])) ||
 			((valid_output_previously[port_num] && 
-			 (output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT) &&
+			 ((output_flit_type == BODY_FLIT) || (output_flit_type == TAIL_FLIT)) &&
 			 
 			 // needs to have 1 clock cycle in advance to prevent buffer overloading
 			(~adjacent_node_vc_are_almost_full[direction[port_num]*NUM_OF_VIRTUAL_CHANNELS+
