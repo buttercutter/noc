@@ -4,16 +4,20 @@ cover
 
 [options]
 proof: mode prove
-proof: depth 20
+proof: depth 8
 
 cover: mode cover
 cover: depth 7
 cover: append 6
 
 [engines]
-smtbmc yices
-# smtbmc boolector
+# smtbmc yices
+# smtbmc z3
+smtbmc boolector
+# smtbmc mathsat
+# smtbmc cvc4
 # abc pdr
+# abc bmc3
 # aiger avy
 # aiger suprove
 

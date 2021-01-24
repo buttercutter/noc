@@ -252,7 +252,7 @@ wire [FLIT_TOTAL_WIDTH-1:0] node_own_data [NUM_OF_PORTS-1:0];
 
 // let FLIT_DATA_WIDTH = 16 in the discussion below:
 // let HEAD_TAIL = 2  to indicate flit type
-// let FLIT_TOTAL_WIDTH = HEAD_TAIL + FLIT_DATA_WIDTH
+// let FLIT_TOTAL_WIDTH = HEAD_TAIL + VIRTUAL_CHANNELS_BITWIDTH + FLIT_DATA_WIDTH
 
 // 19-bit head flit format as follows: {01, prev_vc, destination_node, source_node, 10 bits of data_payload}
 // prev_vc consumes 1 bit, destination_node or source node consume 3 bits (8 nodes in total), 
@@ -513,7 +513,7 @@ generate
 
 					else if($past(enqueue_en[port_num][vc_num]) && 
 						   (($past(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL]) == HEAD_FLIT) ||
-							 vc_is_allocated_by_head_flit_previously[port_num][vc_num]))
+							($past(input_flit_type[port_num*HEAD_TAIL +: HEAD_TAIL]) == BODY_FLIT)))
 						
 							assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]) + 
 									flit_data_input_previously[port_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
