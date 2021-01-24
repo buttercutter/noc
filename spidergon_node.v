@@ -562,6 +562,8 @@ generate
 					    
 							assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]) +
 								previous_data_input_to_vc[port_num][vc_num][0 +: ACTUAL_DATA_PAYLOAD_WIDTH]);
+								
+						else assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]));
 					end
 					
 					else assert(sum_data[port_num][vc_num] == $past(sum_data[port_num][vc_num]));
