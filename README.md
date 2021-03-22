@@ -1,5 +1,5 @@
 # noc
-A simple [spidergon network-on-chip](http://sci-hub.tw/https://ieeexplore.ieee.org/abstract/document/1411133) with [wormhole switching](https://en.wikipedia.org/wiki/Wormhole_switching) feature
+A simple [spidergon network-on-chip](http://sci-hub.do/https://ieeexplore.ieee.org/abstract/document/1411133) with [wormhole switching](https://en.wikipedia.org/wiki/Wormhole_switching) feature
 
 USAGE :
 1. Synthesis : `yosys spidergon.ys`
